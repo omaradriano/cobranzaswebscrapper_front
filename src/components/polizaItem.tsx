@@ -1,5 +1,5 @@
 import React from "react";
-import type { PolizaType, viewMode } from "../Types/types";
+import type { PolizaType, StatusValues, viewMode } from "../Types/types";
 import styled from "styled-components";
 import ScrollCheckbox from "./checkboxscroll";
 import {
@@ -25,12 +25,12 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
   return (
     <>
       {viewMode === "Mobile" ? (
-        <PolizaItemCustom>
+        <PolizaItemCustom $viewMode={viewMode}>
           <PolizaItemHeader>
             <MayorText>{data.numPoliza}</MayorText>
             <div>
               <MinorText>Notificaciones</MinorText>
-              <ScrollCheckbox noPoliza={data.numPoliza} />
+              <ScrollCheckbox />
             </div>
           </PolizaItemHeader>
           <div>
@@ -42,7 +42,7 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
             <NormalText>{data.asegurado}</NormalText>
           </div>
           <div>
-            <MinorText>Plan:</MinorText>
+            <MinorText>Producto:</MinorText>
             <NormalText>{data.tipoSeguro}</NormalText>
           </div>
           <PolizaItemFooter>
@@ -51,11 +51,35 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
           </PolizaItemFooter>
         </PolizaItemCustom>
       ) : (
-        ""
+        <PolizaItemCustom $viewMode={viewMode}>
+          <p>{data.numPoliza}</p>
+          <p>{data.contratante}</p>
+          <p>{data.asegurado}</p>
+          <p>{data.tipoSeguro}</p>
+          <div>
+            <SpanCard title={data.estatus as StatusValues} />
+          </div>
+          <NotificationDiv>
+            <p>Dias para corte: 10</p>
+            <ScrollCheckbox />
+          </NotificationDiv>
+          <div>
+            <Button label="Detalle" iconName="ChevronRight" />
+          </div>
+        </PolizaItemCustom>
       )}
     </>
   );
 };
+
+const NotificationDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+
+  ${textTheme__css}
+`;
 
 const PolizaItemFooter = styled.div`
   display: flex;
@@ -65,31 +89,32 @@ const PolizaItemFooter = styled.div`
   margin: 10px 0 5px 0;
 `;
 
-const PolizaItemCustom = styled.div`
+const PolizaItemCustom = styled.div<{ $viewMode: viewMode }>`
   display: flex;
-  flex-direction: column;
+  flex-direction: ${(p) => (p.$viewMode === "Mobile" ? "column" : "row")};
+  align-items: ${(p) => (p.$viewMode === "Mobile" ? "" : "center")};
+  text-align: ${(p) => (p.$viewMode === "Mobile" ? "" : "center")};
   ${sectionTheme__css}
   border-radius: 8px;
   padding: 5px 10px;
   ${sectionBorderTheme__css}
 
   & > p {
-    /* flex: 1; */
-    /* display: flex; */
-    /* align-items: center; */
-    /* justify-content: center; */
-    /* text-align: center; */
-    /* height: 65px; */
+    flex: ${(p) => (p.$viewMode === "Mobile" ? "" : "1")};
     ${textTheme__css}
   }
 
-  /*
   & > div {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  } */
+    ${(p) =>
+      p.$viewMode === "Desktop"
+        ? `
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+          `
+        : ``}
+  }
 `;
 
 const PolizaItemHeader = styled.div`

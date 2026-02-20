@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { PolizasNoItems } from "./NoFunctional";
 import Icon from "./icon";
 import PolizaItem from "./polizaItem";
-import { headerTheme } from "../styles/CssComponents";
+import { headerTheme, textTheme__css } from "../styles/CssComponents";
 
 export interface PolizasContainerProps {
   data: PolizaType[];
@@ -31,38 +31,25 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
           <h3>Sin pólizas</h3>
           <p>Comienza por importar tus polizas desde la herramienta</p>
         </PolizasNoItems>
-      ) : isMobile ? (
+      ) : (
         <PolizasItems>
-          {/* <PolizasItemsHeader $theme={theme ?? "Dark"}> */}
-          {/* <p>No. Poliza</p> */}
-          {/* <p>Contratante</p> */}
-          {/* <p>Asegurado principal</p> */}
-          {/* <p>Producto</p> */}
-          {/* <p>Estatus</p> */}
-          {/* <p>Notificaciones</p> */}
-          {/* <p>Acciones</p> */}
-          {/* </PolizasItemsHeader> */}
+          {!isMobile ? (
+            <PolizasItemsHeader>
+              <p>No. Poliza</p>
+              <p>Contratante</p>
+              <p>Asegurado principal</p>
+              <p>Producto</p>
+              <p>Estatus</p>
+              <p>Notificaciones</p>
+              <p></p>
+            </PolizasItemsHeader>
+          ) : null}
           {data.map((elem) => (
             <PolizaItem
               viewMode={isMobile ? "Mobile" : "Desktop"}
               key={elem.numPoliza}
               data={elem}
             ></PolizaItem>
-          ))}
-        </PolizasItems>
-      ) : (
-        <PolizasItems>
-          <PolizasItemsHeader />
-          {/* <p>No. Poliza</p> */}
-          {/* <p>Contratante</p> */}
-          {/* <p>Asegurado principal</p> */}
-          {/* <p>Producto</p> */}
-          {/* <p>Estatus</p> */}
-          {/* <p>Notificaciones</p> */}
-          {/* <p>Acciones</p> */}
-          {/* </PolizasItemsHeader> */}
-          {data.map((elem) => (
-            <PolizaItem key={elem.numPoliza} data={elem}></PolizaItem>
           ))}
         </PolizasItems>
       )}
@@ -83,19 +70,20 @@ const PolizasItemsHeader = styled.div`
   flex-direction: row;
   width: 100%;
   height: 50px;
-  background-color: white;
+  /* background-color: white; */
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 
   & p {
     flex: 1;
-    /* text-align: center; */
+    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    ${textTheme__css}
   }
   & p:nth-child(2n) {
-    background-color: gray;
+    /* background-color: gray; */
   }
 `;
 

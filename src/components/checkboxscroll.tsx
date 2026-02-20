@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 export interface ScrollcheckProps {
   action?: () => void;
-  noPoliza: string;
+  // noPoliza: string;
 }
 
 const ScrollCheckbox: React.FC<ScrollcheckProps> = () => {

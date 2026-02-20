@@ -23,6 +23,7 @@ const SpanCardCustom = styled.div<{
   /* flex: 1; */
   align-items: center;
   height: fit-content;
+  justify-content: center;
   border-radius: 6px;
   padding: 5px 10px;
   width: fit-content;
@@ -35,7 +36,7 @@ const SpanCardCustom = styled.div<{
   & > p {
     display: flex;
     align-items: center;
-    font-size: clamp(14px, 1.5vw, 1.2rem);
+    font-size: clamp(14px, 1.5vw, 1rem);
     height: 24px;
     ${CardTextTheme__CSS}
   }

@@ -15,7 +15,7 @@ export interface ButtonProps {
 const Button: React.FC<ButtonProps> = ({
   label = "Default",
   iconName = "Abc",
-  type = "Danger",
+  type = "Default",
 }) => {
   return (
     <BaseButtonCustom $type={type}>
