@@ -13,8 +13,10 @@ const ThemeToggle: React.FC = () => {
       themeContext?.setTheme(isActive ? 'Dark' : 'Light')
       if(isActive){
         localStorage.setItem('themeMode', 'Dark')
+        setIsActive(false)
       }else{
         localStorage.setItem('themeMode', 'Light')
+        setIsActive(true)
       }
     }}>
       <Scroll $isActive={isActive}>

@@ -11,7 +11,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         return JSON.parse(savedTheme);
       } catch {
-        return savedTheme; 
+        return savedTheme;
       }
     }
 

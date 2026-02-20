@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import type { PreferedScheme } from "../Context/ContextConfig";
-import type { StatusValues } from "../Types/types";
+import type { CardType, StatusValues } from "../Types/types";
 
 export const textResponsive__css = css`
   font-size: clamp(14px, 1.5vw, 1.2rem);
@@ -31,10 +31,6 @@ export const sectionBorderTheme__css = css`
   border: 1px solid ${(p) => getBaseBorderColor(p.theme.mode)};
 `;
 
-export const buttonTheme__css = css`
-  background-color: ${(p) => getDefaultButtonTheme(p.theme.mode)};
-`;
-
 export const getThemeTextColor = ($scheme: PreferedScheme) =>
   $scheme === "Dark" ? "#fff" : "black";
 
@@ -53,10 +49,6 @@ export const getHeaderBorderTheme = ($scheme: PreferedScheme) =>
   $scheme === "Dark"
     ? "var(--border-shadow-dark)"
     : "var(--border-shadow-light)";
-
-export const getDefaultButtonTheme = ($scheme: PreferedScheme) =>
-  $scheme === "Dark" ? "var(--btn-dark-bg)" : "var(--btn-light-bg)";
-
 // export const getDefaultButtonBorderTheme = ($scheme: PreferedScheme) =>
 //   $scheme === "Dark"
 //     ? "var(--btn-dark-color)"
@@ -115,5 +107,42 @@ export const getSuccessBgByTheme = ($scheme: PreferedScheme) =>
 export const getSuccessTextByTheme = ($scheme: PreferedScheme) =>
   $scheme === "Dark"
     ? `--sc-success-color: var(--sc-success-color-dark);
-                        --sc-danger-color: var(--sc-danger-color-dark);`
+       --sc-danger-color: var(--sc-danger-color-dark);`
     : "";
+
+// MARK: BUTTON
+
+/** Configuracion para estilos de botón */
+export const ButtonConf__SC = css<{ $type: CardType }>`
+  /** Se hace una declaracion de los colores que se van a usar
+para el componente */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  opacity: 0.8;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: ${(p) =>
+    p.$type === "Success"
+      ? `var(--sc-success-color-dark)`
+      : p.$type === "Danger"
+        ? `var(--sc-danger-color-dark)`
+        : p.$type === "Warning"
+          ? `var(--sc-warning-color-dark)`
+          : `var(--sc-default-color-dark)`};
+  /** Se sobreescriben los colores por el modo en el que estamos */
+  ${(p) =>
+    p.theme.mode === "Dark"
+      ? `
+        --sc-success-color-dark: var(--sc-success-color);
+        --sc-warning-color-dark: var(--sc-warning-color);
+        --sc-danger-color-dark: var(--sc-danger-color);
+        --sc-default-color-dark: var(--sc-default-color);
+      `
+      : null}
+
+  &:hover {
+    opacity: 1;
+  }
+`;
