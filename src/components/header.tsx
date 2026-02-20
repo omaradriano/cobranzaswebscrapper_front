@@ -13,6 +13,7 @@ import {
   headerTheme,
   textTheme__css,
 } from "../styles/CssComponents";
+import ThemeToggle from "./toggleThemeButton";
 
 export interface HeaderProps {
   title?: string;
@@ -29,6 +30,7 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
   return (
     <HeaderMain>
       <HeaderImg src={segurosMonterreyLogo} alt="Imagen de seguros monterrey" />
+      <ThemeToggle />
       <DesktopView>
         <UserData $usertype={userType}>
           <p>oadrian38@gmail.com</p>

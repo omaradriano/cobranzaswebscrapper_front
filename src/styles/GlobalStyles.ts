@@ -64,6 +64,9 @@ const GlobalStyle = createGlobalStyle<{ $theme: PreferedScheme }>`
     --sc-success-color-dark: #bff0c9;
     --sc-default-color-dark: #e6eef8;
 
+    --theme-color-dark: #121212;
+    --theme-color-light: #F9FAFB;
+
     /** Colores para botones */
     //Default Dark
     --btn-dark-bg: #0b1220;

@@ -4,7 +4,19 @@ import { useState } from "react";
 import type { DefaultTheme } from "styled-components/dist/types";
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState("Dark");
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem("themeMode");
+
+    if (savedTheme) {
+      try {
+        return JSON.parse(savedTheme);
+      } catch {
+        return savedTheme; 
+      }
+    }
+
+    return "Dark";
+  });
 
   const themeValues = {
     mode: theme,

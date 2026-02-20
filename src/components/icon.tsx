@@ -7,7 +7,7 @@ import type { MaterialIconName } from "../Types/types";
 
 export interface IconProps {
   iconName: MaterialIconName;
-  color?: string;
+  customColor?: string;
   size?: number;
   isButton?: boolean;
   action?: () => void;
@@ -17,6 +17,7 @@ const StyledIconWrapper = styled.span<{
   $scheme?: PreferedScheme;
   $size?: number;
   $isButton: boolean;
+  $customColor: string;
 }>`
   display: inline-flex;
   align-items: center;
@@ -28,7 +29,8 @@ const StyledIconWrapper = styled.span<{
   cursor: ${(p) => (p.$isButton ? "pointer" : "initial")};
 
   & svg {
-    ${textTheme__css};
+    ${textTheme__css}
+    color: ${(p) => (p.$customColor ? p.$customColor : "")};
     transition: color 0.3s ease;
     height: 100%;
     width: 100%;
@@ -39,8 +41,12 @@ const StyledIconWrapper = styled.span<{
   }
 `;
 
-const Icon: React.FC<IconProps> = ({ iconName, size, isButton = false }) => {
-
+const Icon: React.FC<IconProps> = ({
+  iconName,
+  size,
+  isButton = false,
+  customColor = "",
+}) => {
   const IconComponent = MuiIcons[iconName];
 
   if (!IconComponent) return null;
@@ -49,6 +55,7 @@ const Icon: React.FC<IconProps> = ({ iconName, size, isButton = false }) => {
     <StyledIconWrapper
       $size={size}
       $isButton={isButton}
+      $customColor={customColor}
     >
       <IconComponent />
     </StyledIconWrapper>
