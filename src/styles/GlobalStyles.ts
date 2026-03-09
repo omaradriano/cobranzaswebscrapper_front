@@ -63,6 +63,7 @@ const GlobalStyle = createGlobalStyle<{ $theme: PreferedScheme }>`
     --sc-warning-color-dark: #ffe6a8;
     --sc-success-color-dark: #bff0c9;
     --sc-default-color-dark: #e6eef8;
+    --sc-warning-color-defaultBlue: #155dfc;
 
     --theme-color-dark: #121212;
     --theme-color-light: #F9FAFB;

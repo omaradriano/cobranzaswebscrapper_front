@@ -5,6 +5,8 @@ import { PolizasNoItems } from "./NoFunctional";
 import Icon from "./icon";
 import PolizaItem from "./polizaItem";
 import { headerTheme, textTheme__css } from "../styles/CssComponents";
+import Modal from "./modal";
+import useModalState from "../customHooks/useModalState";
 
 export interface PolizasContainerProps {
   data: PolizaType[];
@@ -14,6 +16,8 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 768px)").matches,
   );
+
+  const { isOpen, setIsOpen, polizaData, setPolizaData } = useModalState(false);
 
   useEffect(() => {
     const watcher = window.matchMedia("(max-width: 768px)");
@@ -25,6 +29,14 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
 
   return (
     <PolizasContainerCustom>
+      <Modal
+        title="Detalle poliza"
+        setModalOpen={setIsOpen}
+        modalOpen={isOpen}
+        polizaData={polizaData}
+      >
+        <p>Content jeje</p>
+      </Modal>
       {data.length === 0 ? (
         <PolizasNoItems>
           <Icon iconName="ErrorOutline" size={60} />
@@ -49,6 +61,8 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
               viewMode={isMobile ? "Mobile" : "Desktop"}
               key={elem.numPoliza}
               data={elem}
+              setModalOpen={setIsOpen}
+              setPolizaData={setPolizaData}
             ></PolizaItem>
           ))}
         </PolizasItems>

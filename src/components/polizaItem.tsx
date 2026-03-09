@@ -16,11 +16,15 @@ import SpanCard from "./spanCard";
 export interface PolizaItemProps {
   data: PolizaType;
   viewMode?: viewMode;
+  setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setPolizaData: React.Dispatch<React.SetStateAction<PolizaType>>;
 }
 
 const PolizaItem: React.FC<PolizaItemProps> = ({
   data,
   viewMode = "Mobile",
+  setModalOpen,
+  setPolizaData,
 }) => {
   return (
     <>
@@ -47,7 +51,14 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
           </div>
           <PolizaItemFooter>
             <SpanCard title={data.estatus}></SpanCard>
-            <Button label="Detalles" iconName="ChevronRight" />
+            <Button
+              action={() => {
+                setPolizaData(data);
+                setModalOpen(true);
+              }}
+              label="Detalles"
+              iconName="ChevronRight"
+            />
           </PolizaItemFooter>
         </PolizaItemCustom>
       ) : (
@@ -64,7 +75,14 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
             <ScrollCheckbox />
           </NotificationDiv>
           <div>
-            <Button label="Detalle" iconName="ChevronRight" />
+            <Button
+              label="Detalle"
+              iconName="ChevronRight"
+              action={() => {
+                setPolizaData(data);
+                setModalOpen(true);
+              }}
+            />
           </div>
         </PolizaItemCustom>
       )}

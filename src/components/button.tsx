@@ -14,19 +14,19 @@ export interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({
   label = "Default",
-  iconName = "Abc",
+  iconName,
   type = "Default",
+  action = () => {},
 }) => {
   return (
-    <BaseButtonCustom $type={type}>
+    <BaseButtonCustom $type={type} onClick={action}>
       <p>{label}</p>
-      {iconName ? <Icon iconName={iconName} size={24}></Icon> : ""}
+      {iconName && <Icon iconName={iconName} size={24}></Icon>}
     </BaseButtonCustom>
   );
 };
 
 const BaseButtonCustom = styled.div<{ $type: CardType }>`
-
   ${ButtonConf__SC}
 
   gap: 5px;

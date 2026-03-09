@@ -46,6 +46,7 @@ const Icon: React.FC<IconProps> = ({
   size,
   isButton = false,
   customColor = "",
+  action = () => {},
 }) => {
   const IconComponent = MuiIcons[iconName];
 
@@ -56,6 +57,7 @@ const Icon: React.FC<IconProps> = ({
       $size={size}
       $isButton={isButton}
       $customColor={customColor}
+      onClick={action}
     >
       <IconComponent />
     </StyledIconWrapper>

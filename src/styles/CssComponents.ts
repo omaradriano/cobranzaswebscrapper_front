@@ -130,7 +130,9 @@ para el componente */
         ? `var(--sc-danger-color-dark)`
         : p.$type === "Warning"
           ? `var(--sc-warning-color-dark)`
-          : `var(--sc-default-color-dark)`};
+          : p.$type === "DefaultBlue"
+            ? `var(--sc-warning-color-defaultBlue)`
+            : `var(--sc-default-color-dark)`};
   /** Se sobreescriben los colores por el modo en el que estamos */
   ${(p) =>
     p.theme.mode === "Dark"
@@ -144,5 +146,43 @@ para el componente */
 
   &:hover {
     opacity: 1;
+  }
+`;
+
+//MARK: FLEXBOX
+export const FlexColumn__SC = css`
+  display: flex;
+  flex-direction: column;
+`;
+export const FlexRow__SC = css`
+  display: flex;
+  flex-direction: row;
+`;
+
+//MARK: COMPS
+
+export const CardComponent__SC = css`
+  ${textTheme__css}
+  background-color: ${(p) =>
+    p.theme.mode === "Dark" ? `var(--bg-dark-header)` : `#fff`};
+  border-radius: 8px;
+  padding: 20px 30px;
+  height: fit-content;
+  border: 1px solid
+    ${(p) =>
+      p.theme.mode === "Dark"
+        ? "var(--border-shadow-dark)"
+        : "var(--border-shadow-light)"};
+`;
+
+//MARK: AUX
+
+export const Link__SC = css`
+  color: var(--sc-warning-color-defaultBlue);
+  cursor: pointer;
+  transition: 0.3s ease;
+  &:hover {
+    color: white;
+    border-bottom: 1px solid #fff;
   }
 `;

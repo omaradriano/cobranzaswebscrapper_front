@@ -18,7 +18,7 @@ export type StatusValues = "En Vigor" | "Anulada";
 
 export type viewMode = "Mobile" | "Desktop";
 
-export type CardType = "Default" | "Danger" | "Warning" | "Success";
+export type CardType = "Default" | "Danger" | "Warning" | "Success" | "DefaultBlue";
 
 export type MaterialIconName = keyof typeof MuiIcons;
 
