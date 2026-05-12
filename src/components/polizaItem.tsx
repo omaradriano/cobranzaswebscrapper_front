@@ -1,7 +1,7 @@
 import React from "react";
-import type { PolizaType, StatusValues, viewMode } from "../Types/types";
+import type { PolizaGetItem, StatusValues, viewMode } from "../Types/types";
 import styled from "styled-components";
-import ScrollCheckbox from "./checkboxscroll";
+// import ScrollCheckbox from "./checkboxscroll";
 import {
   MayorText,
   MinorText,
@@ -12,12 +12,18 @@ import {
 } from "../styles/CssComponents";
 import Button from "./button";
 import SpanCard from "./spanCard";
+import CounterCard from "./counterCard";
+import { calculateDaysUntilLimit } from "../functions/globalFunctions";
 
 export interface PolizaItemProps {
-  data: PolizaType;
+  data: PolizaGetItem;
   viewMode?: viewMode;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setPolizaData: React.Dispatch<React.SetStateAction<PolizaType>>;
+  setPolizaData: React.Dispatch<React.SetStateAction<PolizaGetItem>>;
+  notificationsNotifier: {
+    stateAction: React.Dispatch<React.SetStateAction<PolizaGetItem[]>>;
+    stateValue: PolizaGetItem[];
+  };
 }
 
 const PolizaItem: React.FC<PolizaItemProps> = ({
@@ -25,16 +31,27 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
   viewMode = "Mobile",
   setModalOpen,
   setPolizaData,
+  // notificationsNotifier
 }) => {
   return (
     <>
       {viewMode === "Mobile" ? (
         <PolizaItemCustom $viewMode={viewMode}>
           <PolizaItemHeader>
-            <MayorText>{data.numPoliza}</MayorText>
+            <MayorText>{data.num_poliza}</MayorText>
             <div>
-              <MinorText>Notificaciones</MinorText>
-              <ScrollCheckbox />
+              {/* <MinorText>Días para corte</MinorText> */}
+              <CounterCard
+                label="Días para corte"
+                count={calculateDaysUntilLimit(data.next_payment)}
+                paymentdata={{
+                asegurador: data.user_uuid,
+                poliza: data.poliza_uuid,
+                paid_period: data.next_payment,
+                num_poliza: data.num_poliza
+              }}
+              ></CounterCard>
+              {/* <ScrollCheckbox active={data.allownotifications} /> */}
             </div>
           </PolizaItemHeader>
           <div>
@@ -47,7 +64,7 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
           </div>
           <div>
             <MinorText>Producto:</MinorText>
-            <NormalText>{data.tipoSeguro}</NormalText>
+            <NormalText>{data.tipo_seguro}</NormalText>
           </div>
           <PolizaItemFooter>
             <SpanCard title={data.estatus}></SpanCard>
@@ -63,16 +80,27 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
         </PolizaItemCustom>
       ) : (
         <PolizaItemCustom $viewMode={viewMode}>
-          <p>{data.numPoliza}</p>
+          <p>{data.num_poliza}</p>
           <p>{data.contratante}</p>
           <p>{data.asegurado}</p>
-          <p>{data.tipoSeguro}</p>
+          <p>{data.tipo_seguro}</p>
           <div>
             <SpanCard title={data.estatus as StatusValues} />
           </div>
           <NotificationDiv>
-            <p>Dias para corte: 10</p>
-            <ScrollCheckbox />
+            <CounterCard
+              count={data.haslog === 0 ? '?' : calculateDaysUntilLimit(data.next_payment)}
+              paymentdata={{
+                asegurador: data.user_uuid,
+                poliza: data.poliza_uuid,
+                paid_period: data.next_payment,
+                num_poliza: data.num_poliza
+              }}
+            ></CounterCard>
+            {/* <ScrollCheckbox active={data.allownotifications} action={()=>{
+              // notificationsNotifier.stateAction
+              console.log(`ha cambiado el estado del elemento ${data.numPoliza}`);
+            }}/> */}
           </NotificationDiv>
           <div>
             <Button
@@ -114,7 +142,8 @@ const PolizaItemCustom = styled.div<{ $viewMode: viewMode }>`
   text-align: ${(p) => (p.$viewMode === "Mobile" ? "" : "center")};
   ${sectionTheme__css}
   border-radius: 8px;
-  padding: 5px 10px;
+  /* height: 90px; */
+  padding: 8px 10px;
   ${sectionBorderTheme__css}
 
   & > p {
@@ -132,6 +161,12 @@ const PolizaItemCustom = styled.div<{ $viewMode: viewMode }>`
             flex: 1;
           `
         : ``}
+  }
+
+  & > p:nth-child(1) {
+    overflow: hidden;
+    /* white-space: nowrap; */
+    text-overflow: ellipsis;
   }
 `;
 

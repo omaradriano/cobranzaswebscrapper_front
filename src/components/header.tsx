@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import segurosMonterreyLogo from "@/assets/logosegurosmonterrey.png";
+import headerlogo from "@/assets/react.svg";
 import Icon from "./icon";
 import { useContext } from "react";
 import {
@@ -30,8 +30,8 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
 
   return (
     <HeaderMain>
-      <HeaderImg src={segurosMonterreyLogo} alt="Imagen de seguros monterrey" />
-      <NavLink to="/auth">Ir a auth</NavLink>
+      <HeaderImg src={headerlogo} alt="Logo de app" />
+      <NavLink to="/auth/register">Ir a auth</NavLink>
       <NavLink to="/dashboard">Ir a dash</NavLink>
       <ThemeToggle />
       <DesktopView>

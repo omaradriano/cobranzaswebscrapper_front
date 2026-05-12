@@ -7,15 +7,17 @@ export interface StatTagProps {
   amount: number;
   title: string;
   type?: CardType;
+  filter?: ()=>void
 }
 
-const StatCard: React.FC<StatTagProps> = ({ amount, title, type }) => {
+const StatCard: React.FC<StatTagProps> = ({ amount, title, type, filter = ()=>{} }) => {
   const theme = useContext(ThemeContext);
 
   return (
     <StatCardCustom
       $type={type ?? "Warning"}
       $themeMode={theme?.theme as PreferedScheme}
+      onClick={filter}
     >
       <p>{title}</p>
       <h3>{amount}</h3>
@@ -36,6 +38,8 @@ const StatCardCustom = styled.div<{
   height: 80px;
   border-radius: 7px;
   padding: 10px;
+
+  cursor: pointer;
 
   max-width: 280px;
 
@@ -77,6 +81,10 @@ const StatCardCustom = styled.div<{
     box-shadow: 0 1px 2px rgba(0,0,0,0.6);
   `
   : ""}
+
+  &:hover {
+    filter: brightness(1.2)
+  }
 
   h3 {
     margin: 0;

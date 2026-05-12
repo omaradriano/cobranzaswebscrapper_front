@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { PolizaType } from "../Types/types";
+import type { PolizaGetItem } from "../Types/types";
 import styled from "styled-components";
 import { PolizasNoItems } from "./NoFunctional";
 import Icon from "./icon";
@@ -9,15 +9,23 @@ import Modal from "./modal";
 import useModalState from "../customHooks/useModalState";
 
 export interface PolizasContainerProps {
-  data: PolizaType[];
+  data: PolizaGetItem[];
+  notificationsNotifier: {
+    stateAction: React.Dispatch<React.SetStateAction<PolizaGetItem[]>>;
+    stateValue: PolizaGetItem[];
+  };
 }
 
-const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
+const PolizasContainer: React.FC<PolizasContainerProps> = ({
+  data,
+  notificationsNotifier,
+}) => {
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 768px)").matches,
   );
 
   const { isOpen, setIsOpen, polizaData, setPolizaData } = useModalState(false);
+  // const { showAlert, setShowAlert, alertData, setAlertData } = useModalAlert(false);
 
   useEffect(() => {
     const watcher = window.matchMedia("(max-width: 768px)");
@@ -34,10 +42,8 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
         setModalOpen={setIsOpen}
         modalOpen={isOpen}
         polizaData={polizaData}
-      >
-        <p>Content jeje</p>
-      </Modal>
-      {data.length === 0 ? (
+      />
+      {data?.length === 0 || data === null ? (
         <PolizasNoItems>
           <Icon iconName="ErrorOutline" size={60} />
           <h3>Sin pólizas</h3>
@@ -52,17 +58,18 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({ data }) => {
               <p>Asegurado principal</p>
               <p>Producto</p>
               <p>Estatus</p>
-              <p>Notificaciones</p>
+              <p>Días para corte</p>
               <p></p>
             </PolizasItemsHeader>
           ) : null}
           {data.map((elem) => (
             <PolizaItem
               viewMode={isMobile ? "Mobile" : "Desktop"}
-              key={elem.numPoliza}
+              key={elem.num_poliza}
               data={elem}
               setModalOpen={setIsOpen}
               setPolizaData={setPolizaData}
+              notificationsNotifier={notificationsNotifier}
             ></PolizaItem>
           ))}
         </PolizasItems>
@@ -108,8 +115,11 @@ const PolizasContainerCustom = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
+  padding: 0px 0;
   /* ${headerTheme} */
   border-radius: 8px;
+  height: calc(100vh - 330px);
+  overflow-y: auto;
   /* padding: 40px 10px; */
   /* align-items: center; */
   /* border: 1px solid #ababab1f; */

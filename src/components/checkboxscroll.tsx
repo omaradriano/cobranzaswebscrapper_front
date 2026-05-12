@@ -3,18 +3,24 @@ import styled from "styled-components";
 
 export interface ScrollcheckProps {
   action?: () => void;
-  // noPoliza: string;
+  active: boolean;
 }
 
-const ScrollCheckbox: React.FC<ScrollcheckProps> = () => {
-  const [isActive, setIsActive] = useState(false);
+const ScrollCheckbox: React.FC<ScrollcheckProps> = ({
+  active = false,
+  action = () => {},
+}) => {
+  const [isActive, setIsActive] = useState(active);
 
   return (
     <ScrollCheckCustom
       $isActive={isActive}
-      onClick={() => setIsActive(!isActive)}
+      onClick={() => {
+        setIsActive(!isActive)
+        action()
+      }}
     >
-      <Scroll $isActive={isActive} />
+      <Scroll $isActive={isActive}/>
     </ScrollCheckCustom>
   );
 };

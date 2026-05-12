@@ -119,7 +119,7 @@ para el componente */
   display: flex;
   flex-direction: row;
   align-items: center;
-  opacity: 0.8;
+  opacity: 1;
   padding: 5px 10px;
   border-radius: 6px;
   cursor: pointer;
@@ -174,6 +174,10 @@ export const CardComponent__SC = css`
         ? "var(--border-shadow-dark)"
         : "var(--border-shadow-light)"};
 `;
+
+export const InputText__SC = css`
+
+`
 
 //MARK: AUX
 

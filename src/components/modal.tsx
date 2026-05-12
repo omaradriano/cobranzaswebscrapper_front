@@ -3,8 +3,13 @@ import styled from "styled-components";
 import Icon from "./icon";
 import { sectionTheme__css, textTheme__css } from "../styles/CssComponents";
 import Button from "./button";
-import type { PolizaType } from "../Types/types";
-import ScrollCheckbox from "./checkboxscroll";
+import type { PolizaGetItem } from "../Types/types";
+import CounterCard from "./counterCard";
+import {
+  calculateDaysUntilLimit,
+  formatDate,
+} from "../functions/globalFunctions";
+// import ScrollCheckbox from "./checkboxscroll";
 
 export interface ModalProps {
   onClose?: () => void;
@@ -12,7 +17,7 @@ export interface ModalProps {
   title: string;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   modalOpen: boolean;
-  polizaData: PolizaType;
+  polizaData: PolizaGetItem;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -36,7 +41,6 @@ const Modal: React.FC<ModalProps> = ({
                   size={24}
                   isButton={true}
                   action={() => {
-                    console.log("Click a cerrar");
                     setModalOpen(false);
                   }}
                 ></Icon>
@@ -44,10 +48,10 @@ const Modal: React.FC<ModalProps> = ({
               <ModalBody>
                 <BodyRow>
                   <p>No. de poliza:</p>
-                  <p>{polizaData.numPoliza}</p>
+                  <p>{polizaData.num_poliza}</p>
                 </BodyRow>
                 <BodyRow>
-                  <p>Asegurado:</p>
+                  <p>Asegurado(s):</p>
                   <p>{polizaData.asegurado}</p>
                 </BodyRow>
                 <BodyRow>
@@ -64,20 +68,51 @@ const Modal: React.FC<ModalProps> = ({
                 </BodyRow>
                 <BodyRow>
                   <p>Fecha de emisión:</p>
-                  <p>{polizaData.fechaEmision}</p>
+                  <p>{formatDate(polizaData.fecha_emision)}</p>
                 </BodyRow>
                 <BodyRow>
                   <p>Forma de pago:</p>
-                  <p>{polizaData.formaPago}</p>
+                  <p>{polizaData.forma_pago}</p>
+                </BodyRow>
+                <BodyRow>
+                  <p>Medio de cobro:</p>
+                  <p>{polizaData.medio_cobro}</p>
                 </BodyRow>
                 <BodyRow>
                   <p>Plan:</p>
                   <p>{polizaData.plan}</p>
                 </BodyRow>
                 <BodyRow>
-                  <p>Notificaciones</p>
-                  <ScrollCheckbox />
+                  <p>Siguiente pago:</p>
+                  <p>{formatDate(polizaData.next_payment)}</p>
                 </BodyRow>
+                <BodyRow>
+                  <p>Direccion:</p>
+                  <p>
+                    Calle y numero: {polizaData.direccion.calle} | Colonia:{" "}
+                    {polizaData.direccion.colonia} | Estado y ciudad:{" "}
+                    {polizaData.direccion.estado}, {polizaData.direccion.ciudad}
+                    . Codigo Postal: {polizaData.direccion.codigo_postal}
+                  </p>
+                </BodyRow>
+                <BodyRow>
+                  <p>Días para corte:</p>
+                  <div>
+                    <CounterCard
+                      count={polizaData.haslog === 0 ? '?' : calculateDaysUntilLimit(polizaData.next_payment)}
+                      paymentdata={{
+                        asegurador: polizaData.user_uuid,
+                        poliza: polizaData.poliza_uuid,
+                        paid_period: polizaData.next_payment,
+                        num_poliza: polizaData.num_poliza
+                      }}
+                    ></CounterCard>
+                  </div>
+                </BodyRow>
+                {/* <BodyRow>
+                  <p>Notificaciones</p>
+                  <ScrollCheckbox active={polizaData.allownotifications}/>
+                </BodyRow> */}
               </ModalBody>
               <ModalFooter>
                 <Button
@@ -102,8 +137,13 @@ const BodyRow = styled.div`
 
   & > p {
     display: flex;
-    /* width: clamp(100px, 50%, 300px); */
+    width: 100%;
     ${textTheme__css}
+  }
+
+  & > div {
+    display: flex;
+    width: 100%;
   }
 
   & > p:nth-child(1) {
