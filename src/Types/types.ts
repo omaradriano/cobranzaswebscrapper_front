@@ -69,7 +69,7 @@ export type FilterType =
 
 export type MaterialIconName = keyof typeof MuiIcons;
 
-export type Insurance = 'SM' | 'Unknown' | null
+export type Insurance = 'SM' | string | null
 
 declare module "styled-components" {
   export interface DefaultTheme {
