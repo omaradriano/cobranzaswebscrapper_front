@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import type { AlertOptions } from "../customHooks/useModalAlert";
+import type { session_claims } from "../Types/types";
 
 export type PreferedScheme = "Light" | "Dark";
 export const ThemeContext = createContext<{
@@ -15,4 +16,11 @@ export const AlertContext = createContext<{
   setAlertOptions: React.Dispatch<React.SetStateAction<AlertOptions>>;
   showAlert: boolean;
   setShowAlert: React.Dispatch<React.SetStateAction<boolean>>;
+} | null>(null);
+
+export const AuthContext = createContext<{
+  isAuthenticated: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  session: session_claims | null;
+  setSession: React.Dispatch<React.SetStateAction<session_claims | null>>;
 } | null>(null);

@@ -4,6 +4,7 @@ import headerlogo from "@/assets/react.svg";
 import Icon from "./icon";
 import { useContext } from "react";
 import {
+  AuthContext,
   UserModeContext,
   type UserMode,
 } from "../Context/ContextConfig";
@@ -13,8 +14,7 @@ import {
   headerTheme,
   textTheme__css,
 } from "../styles/CssComponents";
-import ThemeToggle from "./toggleThemeButton";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 export interface HeaderProps {
   title?: string;
@@ -27,29 +27,70 @@ export interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
   const userMode = useContext(UserModeContext);
+  const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+
+  // Evaluamos si existe una sesión activa de forma clara
+  const isAuthenticated = auth?.session != null;
 
   return (
     <HeaderMain>
-      <HeaderImg src={headerlogo} alt="Logo de app" />
-      <NavLink to="/auth/register">Ir a auth</NavLink>
-      <NavLink to="/dashboard">Ir a dash</NavLink>
-      <ThemeToggle />
+      <HeaderImg
+        src={headerlogo}
+        alt="Logo de app"
+        onClick={() => navigate("/home")}
+      />
+
+      {/* <ThemeToggle /> */}
+
       <DesktopView>
-        <UserData $usertype={userType}>
-          <p>oadrian38@gmail.com</p>
-          <UserModeTag $usertype={userMode ?? "Demo"}>
-            {userMode ?? "Demo"}
-          </UserModeTag>
-        </UserData>
-        <Icon iconName="Settings" size={24} isButton={true}></Icon>
-        <Icon iconName="Logout" size={24} isButton={true}></Icon>
+        {/* VISTA CON SESIÓN ACTIVA */}
+        {isAuthenticated ? (
+          <>
+            <UserData $usertype={userType}>
+              <p>{auth?.session?.email}</p>
+              <UserModeTag $usertype={userMode ?? "Demo"}>
+                {userMode ?? "Demo"}
+              </UserModeTag>
+            </UserData>
+
+            <Icon iconName="Settings" size={24} isButton={true} />
+
+            <Icon
+              iconName="Logout"
+              size={24}
+              isButton={true}
+              action={() => {
+                localStorage.removeItem("session_jwt");
+                auth?.setSession(null);
+                auth?.setIsAuthenticated(false); // Asegúrate de apagar tu bandera global de auth si la usas
+                navigate("/home");
+              }}
+            />
+          </>
+        ) : (
+          /* VISTA SIN SESIÓN */
+          <LoginLink to="/auth/signin">Iniciar sesión</LoginLink>
+        )}
       </DesktopView>
+
       <MobileView>
-        <Icon iconName="Menu" size={40} isButton={true}></Icon>
+        <Icon iconName="Menu" size={40} isButton={true} />
       </MobileView>
     </HeaderMain>
   );
 };
+
+// Estilos para el enlace de inicio de sesión que combinen con tu tema de texto
+const LoginLink = styled(NavLink)`
+  text-decoration: none;
+  font-weight: 500;
+  ${textTheme__css};
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
 
 const HeaderMain = styled.div`
   ${headerTheme}
@@ -65,7 +106,9 @@ const HeaderMain = styled.div`
   }
 `;
 
-const HeaderImg = styled.img``;
+const HeaderImg = styled.img`
+  cursor: pointer;
+`;
 
 const MobileView = styled.div`
   display: none;
@@ -76,7 +119,6 @@ const MobileView = styled.div`
 
 const DesktopView = styled.div`
   display: none;
-  /* display: flex; */
   flex-direction: row;
   align-items: center;
   gap: 20px;

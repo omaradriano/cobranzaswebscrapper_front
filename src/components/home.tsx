@@ -1,10 +1,6 @@
 import React from 'react'
 
-export interface HomeProps {
-
-}
-
-const Home: React.FC<HomeProps> = () => {
+const Home: React.FC = () => {
     return (
         <div>
             <h1>This section renders home</h1>

@@ -54,8 +54,6 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({
           {!isMobile ? (
             <PolizasItemsHeader>
               <p>No. Poliza</p>
-              <p>Contratante</p>
-              <p>Asegurado principal</p>
               <p>Producto</p>
               <p>Estatus</p>
               <p>Días para corte</p>

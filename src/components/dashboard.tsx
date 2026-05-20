@@ -1,242 +1,325 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import { ThemeContext, type PreferedScheme } from "../Context/ContextConfig";
+import {
+  AuthContext,
+  ThemeContext,
+  type PreferedScheme,
+} from "../Context/ContextConfig";
+
 import StatTag from "./statCard";
 import PolizasContainer from "./polizasContainer";
+import Button from "./button";
+import Icon from "./icon";
+import Alert from "./modalAlert";
+import SearchBar from "./searchbar";
+
 import {
   CardComponent__SC,
   FlexColumn__SC,
   FlexRow__SC,
   textTheme__css,
 } from "../styles/CssComponents";
-import type { PolizaGetItem, PolizaType } from "../Types/types";
-import Button from "./button";
-import Icon from "./icon";
-import Alert from "./modalAlert";
-import { calculateDaysRemaining } from "../functions/globalFunctions";
-// import SearchBar from "./searchbar";
 
-export interface DashboardProps {
-  title?: string;
-}
+import type { PolizaGetItem } from "../Types/types";
+import { useNavigate } from "react-router";
 
-const Dashboard: React.FC<DashboardProps> = () => {
+const Dashboard: React.FC = () => {
   const theme = useContext(ThemeContext);
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [polizasData, setPolizasData] = useState<PolizaGetItem[]>([]);
-
-  const [totalPolizas, setTotalPolizas] = useState<number>(0);
-  const [polizasActivas, setPolizasActivas] = useState<number>(0);
-  const [polizasPorVencer, setPolizasPorVencer] = useState<number>(0);
-  const [polizasAnuladas, setPolizasAnuladas] = useState<number>(0);
-
-  const jwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im9hZHJpYW4zOEBnbWFpbC5jb20iLCJleHAiOjE3NzgzNTQ2NzQsInJvbGUiOiJ0ZXN0Um9sZSIsInVzZXJfdXVpZCI6ImMyNzVmNWUyLTM2YjUtNDRkNC1iZDBmLTJkY2RiM2Q5ODNlMCJ9.s3Py84Sj1310V3i9fZpb3Zipf_5M1_rrx_9XutNoYp0` 
-
   const [polizasChanged, setPolizasChanged] = useState<PolizaGetItem[]>([]);
 
-  useEffect(() => {
-    fetch("http://localhost:3006/v1/scrapping/polizas/all", {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setTotalPolizas(data.payload.length);
+  const [searchValue, setSearchValue] = useState("");
 
-        setPolizasData(data.payload);
+  const [currentPage, setCurrentPage] = useState(1);
 
-        console.log(data.payload);
+  const [filters, setFilters] = useState<{
+    [key: string]: string;
+  }>({});
 
-        setPolizasActivas(
-          data.payload.reduce((acc: number, curr: PolizaType) => {
-            if (curr.estatus === "En Vigor") {
-              return acc + 1;
-            }
-            return acc;
-          }, 0),
-        );
+  const [detailsData, setDetailsData] = useState<{
+    success: boolean;
+    payload: {
+      total: number;
+      activas: number;
+      por_vencer: number;
+      inactivas: number;
+      sin_pago_registrado: number;
+      cobertura_activa: number;
+    };
+  } | null>(null);
 
-        setPolizasAnuladas(
-          data.payload.reduce((acc: number, curr: PolizaGetItem) => {
-            if (curr.estatus === "Anulada") {
-              return acc + 1;
-            }
-            return acc;
-          }, 0),
-        );
+  const [maxPages, setMaxPages] = useState(1);
 
-        setPolizasPorVencer(
-          data.payload.reduce((acc: number, curr: PolizaGetItem) => {
-            if (calculateDaysRemaining(curr.next_payment) < 5) {
-              return acc + 1;
-            }
-            return acc;
-          }, 0),
-        );
+  function convertFiltersToString(currentFilters: { [key: string]: string }) {
+    const entries = Object.entries(currentFilters);
 
-        // setPolizasInactivas(totalPolizas - polizasActivas)
+    if (!entries.length) return "";
+
+    return (
+      "&" +
+      entries
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .join("&")
+    );
+  }
+
+  async function fetchPolizas(query_params: string) {
+    const session_token = localStorage.getItem("session_jwt");
+
+    if (!session_token) {
+      auth?.setIsAuthenticated(false);
+      navigate("/home");
+      return null;
+    }
+
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:3006/v1/scrapping/polizas?pageSize=10&currentPage=${currentPage}${query_params}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session_token}`,
+          },
+        },
+      );
+
+      const data = await res.json();
+
+      if (!data.success) return null;
+
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async function getPolizasDetails() {
+    const session_token = localStorage.getItem("session_jwt");
+
+    if (!session_token) {
+      auth?.setIsAuthenticated(false);
+      navigate("/home");
+      return null;
+    }
+
+    try {
+      const res = await fetch("http://127.0.0.1:3006/v1/scrapping/details", {
+        headers: {
+          Authorization: `Bearer ${session_token}`,
+        },
       });
+
+      const data = await res.json();
+
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      const filtersString = convertFiltersToString(filters);
+
+      const data = await fetchPolizas(filtersString);
+
+      if (data?.payload) {
+        setPolizasData(data.payload.items);
+
+        setMaxPages(data.payload.pages || 1);
+      }
+    };
+
+    loadData();
+  }, [currentPage, filters]);
+
+  useEffect(() => {
+    const loadDetails = async () => {
+      const data = await getPolizasDetails();
+
+      if (data) {
+        setDetailsData(data);
+      }
+    };
+
+    loadDetails();
   }, []);
 
   return (
     <DashboardContainer>
       <Alert />
+
       <DashboardHeader>
         <DashboardTitle>Mis pólizas</DashboardTitle>
+
         <DashboardText $theme={theme?.theme as PreferedScheme}>
-          Gestiona tus recordatorios de corte de pólizas. Configurados para
-          recordarte 7 días antes.
+          Gestiona tus recordatorios de corte de pólizas.
         </DashboardText>
       </DashboardHeader>
+
       <DashboardBody>
-        {/* CONTENEDOR PARA LOS TAGS */}
         <StatContainer>
           <StatTag
-            amount={totalPolizas}
-            title="Total de polizas"
+            amount={detailsData?.payload.total ?? 0}
+            title="Total"
             type="Default"
             filter={() => {
-              fetch("http://localhost:3006/v1/scrapping/polizas/all", {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  setPolizasData(data.payload);
-                });
+              setFilters({});
+              setCurrentPage(1);
+              setSearchValue("");
             }}
-          ></StatTag>
-          {/* <StatTag
-            amount={polizasActivas}
-            title="Polizas activas"
-            type="Success"
-          ></StatTag> */}
+          />
+
           <StatTag
-            amount={polizasActivas}
-            title="Polizas activas"
+            amount={detailsData?.payload.activas ?? 0}
+            title="Activas"
             type="Success"
             filter={() => {
-              fetch("http://localhost:3006/v1/scrapping/polizas/active", {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  setPolizasData(data.payload);
-                });
+              setFilters({
+                estatus: "En Vigor",
+              });
+
+              setCurrentPage(1);
+              setSearchValue("");
             }}
-          ></StatTag>
+          />
+
           <StatTag
-            amount={polizasAnuladas}
-            title="Polizas anuladas"
+            amount={detailsData?.payload.inactivas ?? 0}
+            title="Anuladas"
             type="Danger"
             filter={() => {
-              fetch("http://localhost:3006/v1/scrapping/polizas/inactive", {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  setPolizasData(data.payload);
-                });
+              setFilters({
+                estatus: "Anulada",
+              });
+
+              setCurrentPage(1);
+              setSearchValue("");
             }}
-          ></StatTag>
+          />
+
           <StatTag
-            amount={polizasPorVencer}
-            title="Polizas por vencer"
+            amount={detailsData?.payload.por_vencer ?? 0}
+            title="Por vencer"
             type="Warning"
             filter={() => {
-              fetch("http://localhost:3006/v1/scrapping/polizas/almost_due", {
-                headers: {
-                  Authorization: `Bearer ${jwt}`,
-                },
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                  setPolizasData(data.payload);
-                });
+              setFilters({
+                next_due: "true",
+              });
+
+              setCurrentPage(1);
+              setSearchValue("");
             }}
-          ></StatTag>
+          />
         </StatContainer>
 
-        {/* BARRA DE BUSQUEDA */}
-        {/* <SearchBar /> */}
+        <SearchBar
+          stateValue={filters}
+          stateChangeValue={setFilters}
+          setCurrentPage={setCurrentPage}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+        />
 
-        {/* CONTENEDOR PARA LA LISTA DE POLIZAS */}
+        <PaginationRow>
+          <Icon
+            iconName="KeyboardArrowLeft"
+            isButton
+            customColor="#000"
+            size={24}
+            action={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 1));
+            }}
+          />
+
+          <PageIndicator>
+            Página {currentPage} de {maxPages}
+          </PageIndicator>
+
+          <Icon
+            iconName="KeyboardArrowRight"
+            isButton
+            customColor="#000"
+            size={24}
+            action={() => {
+              setCurrentPage((prev) => Math.min(prev + 1, maxPages));
+            }}
+          />
+        </PaginationRow>
+
         <PolizasContainer
           data={polizasData}
           notificationsNotifier={{
             stateAction: setPolizasChanged,
             stateValue: polizasChanged,
           }}
-        ></PolizasContainer>
+        />
       </DashboardBody>
-      <AppliedChangesContainer>
+
+      <AppliedChangesContainer $visible={polizasChanged.length > 0}>
         <AppliedChangesHeader>
-          <Icon iconName="Warning" customColor="#f9e423" size={24}></Icon>
+          <Icon iconName="Warning" customColor="#f9e423" size={24} />
+
           <p>
-            Se han aplicado cambios en <span>{polizasChanged.length}</span>{" "}
-            clientes
+            Se han aplicado cambios en <span>{polizasChanged.length}</span>
           </p>
         </AppliedChangesHeader>
+
         <Button
           type="DefaultBlue"
           label="Aplicar cambios"
-          action={() => console.log("Se han aplicado cambios")}
-        ></Button>
+          action={() => console.log("Aplicando")}
+        />
       </AppliedChangesContainer>
     </DashboardContainer>
   );
 };
+
+const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const PageIndicator = styled.span`
+  font-weight: 500;
+`;
 
 const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 10px 4vw;
   gap: 15px;
-  /* background-color: red; */
   height: calc(100vh - 60px);
   position: relative;
 `;
 
-const AppliedChangesContainer = styled.div`
+const AppliedChangesContainer = styled.div<{
+  $visible: boolean;
+}>`
   position: absolute;
-  height: fit-content;
-  width: fit-content;
   bottom: 25px;
   right: 25px;
-  /* background-color: red; */
-  background-color: blue;
+
   ${FlexColumn__SC}
   ${CardComponent__SC}
-  padding: 20px 20px;
-  align-items: center;
+
+display:${(p) => (p.$visible ? "flex" : "none")};
+
+  padding: 20px;
   gap: 10px;
-  border-radius: 8px;
-
-  & > *:nth-child(2) {
-    /* background-color: red; */
-    align-self: flex-end;
-  }
-
-  display: none;
 `;
 
 const AppliedChangesHeader = styled.div`
   ${FlexRow__SC}
-  gap: 10px;
+  gap:10px;
 `;
 
-const DashboardHeader = styled.div`
-  & h1 {
-    font-size: clamp(2rem, 5vw, 2.5rem);
-  }
-`;
+const DashboardHeader = styled.div``;
 
 const DashboardBody = styled.div`
   display: flex;
@@ -246,22 +329,18 @@ const DashboardBody = styled.div`
 
 const StatContainer = styled.div`
   display: flex;
-  flex-direction: row;
   gap: 10px;
-  /* margin: 10px 0; */
   justify-content: center;
-  @media (min-width: 540px) {
-    flex-direction: row;
-  }
 `;
 
 const DashboardTitle = styled.h1`
-  ${textTheme__css};
+  ${textTheme__css}
 `;
 
-const DashboardText = styled.p<{ $theme: PreferedScheme }>`
-  color: ${(p) => (p.$theme === "Dark" ? "#999999" : "#000")};
-  font-size: clamp(16px, 2vw, 1.2rem);
+const DashboardText = styled.p<{
+  $theme: PreferedScheme;
+}>`
+  color: ${(p) => (p.$theme === "Dark" ? "#999" : "#000")};
 `;
 
 export default Dashboard;

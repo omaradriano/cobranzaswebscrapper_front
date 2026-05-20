@@ -3,26 +3,76 @@ import styled from "styled-components";
 import Icon from "./icon";
 import { borderTheme__css } from "../styles/CssComponents";
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  stateValue: { [key: string]: string };
+
+  stateChangeValue: React.Dispatch<
+    React.SetStateAction<{ [key: string]: string }>
+  >;
+
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+
+  searchValue: string;
+
+  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({
+  stateValue,
+  stateChangeValue,
+  setCurrentPage,
+  searchValue,
+  setSearchValue,
+}) => {
+  const handleSearch = () => {
+    setCurrentPage(1);
+
+    if (!searchValue.trim()) {
+      const newState = {
+        ...stateValue,
+      };
+
+      delete newState.numpoliza;
+
+      stateChangeValue(newState);
+
+      return;
+    }
+
+    stateChangeValue({
+      ...stateValue,
+      numpoliza: searchValue.trim(),
+    });
+  };
+
   return (
     <SearchBarContainer>
-      <SearchInput type="text" placeholder="Ej. GM01020304" />
-      <SearchButton>
-        <Icon iconName="Search" isButton={true}></Icon>
+      <SearchInput
+        value={searchValue}
+        placeholder="Buscar póliza..."
+        onChange={(e) => setSearchValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSearch();
+          }
+        }}
+      />
+
+      <SearchButton onClick={handleSearch}>
+        <Icon iconName="Search" size={20} customColor="#000" />
       </SearchButton>
     </SearchBarContainer>
   );
 };
 
 const SearchBarContainer = styled.div`
-  /* background-color: red; */
   width: 100%;
   height: 50px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 10px;
+  padding: 0 15px;
   border: 1px solid #0000003e;
   /* ${borderTheme__css} */
 `;
@@ -46,6 +96,11 @@ const SearchButton = styled.button`
   border: none;
   transition: 0.2s linear;
   opacity: 0.6;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 export default SearchBar;

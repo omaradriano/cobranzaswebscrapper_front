@@ -1,32 +1,7 @@
 import type { PreferedScheme } from "../Context/ContextConfig";
 import * as MuiIcons from "@mui/icons-material";
 
-export type PolizaType = {
-  asegurado: string;
-  contratante: string;
-  diaCobro: number;
-  estatus: StatusValues;
-  fechaEmision: string;
-  formaPago: string;
-  medioCobro: string;
-  numPoliza: string;
-  plan: string;
-  tipoSeguro: string;
-  allownotifications: boolean;
-  direccion: {
-    calle: string;
-    codigoPostal: string;
-    ciudad: string;
-    estado: string;
-    colonia: string;
-  };
-  dueIndicator: string;
-  next_payment: string;
-};
-
 export type PolizaGetItem = {
-  asegurado: string;
-  contratante: string;
   diaCobro: number;
   estatus: StatusValues;
   fecha_emision: string;
@@ -35,18 +10,46 @@ export type PolizaGetItem = {
   num_poliza: string;
   plan: string;
   tipo_seguro: string;
+  asegurados: [{ nombre: string; is_principal: boolean; birthday: string }];
+  moneda: string;
+  pais: string;
+  email: string;
+  telefono: string;
   direccion: {
     calle: string;
-    codigo_postal: string;
+    codigoPostal: string;
     ciudad: string;
     estado: string;
     colonia: string;
   };
   next_payment: string;
   poliza_uuid: string;
-  user_uuid: string;
-  haslog: number
+  agente_uuid: string;
 };
+
+// export type PolizaGetItem = {
+//   asegurado: string;
+//   contratante: string;
+//   diaCobro: number;
+//   estatus: StatusValues;
+//   fecha_emision: string;
+//   forma_pago: string;
+//   medio_cobro: string;
+//   num_poliza: string;
+//   plan: string;
+//   tipo_seguro: string;
+//   direccion: {
+//     calle: string;
+//     codigo_postal: string;
+//     ciudad: string;
+//     estado: string;
+//     colonia: string;
+//   };
+//   next_payment: string;
+//   poliza_uuid: string;
+//   user_uuid: string;
+//   haslog: number;
+// };
 
 export type StatusValues = "En Vigor" | "Anulada";
 
@@ -69,7 +72,7 @@ export type FilterType =
 
 export type MaterialIconName = keyof typeof MuiIcons;
 
-export type Insurance = 'SM' | string | null
+export type Insurance = "SM" | string | null;
 
 declare module "styled-components" {
   export interface DefaultTheme {
@@ -78,3 +81,12 @@ declare module "styled-components" {
     // Agrega aquí cualquier otra propiedad que hayas puesto en themeValues
   }
 }
+
+export type session_claims = {
+  agente_role: string;
+  agente_uuid: string;
+  email: string;
+  insurance_id: string;
+  insurance_name: string;
+  no_agente: string;
+};

@@ -45,7 +45,7 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
                 label="Días para corte"
                 count={calculateDaysUntilLimit(data.next_payment)}
                 paymentdata={{
-                asegurador: data.user_uuid,
+                asegurador: data.agente_uuid,
                 poliza: data.poliza_uuid,
                 paid_period: data.next_payment,
                 num_poliza: data.num_poliza
@@ -54,14 +54,6 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
               {/* <ScrollCheckbox active={data.allownotifications} /> */}
             </div>
           </PolizaItemHeader>
-          <div>
-            <MinorText>Contratante:</MinorText>
-            <NormalText>{data.contratante}</NormalText>
-          </div>
-          <div>
-            <MinorText>Asegurado:</MinorText>
-            <NormalText>{data.asegurado}</NormalText>
-          </div>
           <div>
             <MinorText>Producto:</MinorText>
             <NormalText>{data.tipo_seguro}</NormalText>
@@ -81,17 +73,15 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
       ) : (
         <PolizaItemCustom $viewMode={viewMode}>
           <p>{data.num_poliza}</p>
-          <p>{data.contratante}</p>
-          <p>{data.asegurado}</p>
           <p>{data.tipo_seguro}</p>
           <div>
             <SpanCard title={data.estatus as StatusValues} />
           </div>
           <NotificationDiv>
             <CounterCard
-              count={data.haslog === 0 ? '?' : calculateDaysUntilLimit(data.next_payment)}
+              count={calculateDaysUntilLimit(data.next_payment)}
               paymentdata={{
-                asegurador: data.user_uuid,
+                asegurador: data.agente_uuid,
                 poliza: data.poliza_uuid,
                 paid_period: data.next_payment,
                 num_poliza: data.num_poliza

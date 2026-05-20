@@ -26,7 +26,6 @@ const Modal: React.FC<ModalProps> = ({
   setModalOpen,
   polizaData,
 }) => {
-  console.log(polizaData);
 
   return (
     <>
@@ -49,14 +48,6 @@ const Modal: React.FC<ModalProps> = ({
                 <BodyRow>
                   <p>No. de poliza:</p>
                   <p>{polizaData.num_poliza}</p>
-                </BodyRow>
-                <BodyRow>
-                  <p>Asegurado(s):</p>
-                  <p>{polizaData.asegurado}</p>
-                </BodyRow>
-                <BodyRow>
-                  <p>Contratante:</p>
-                  <p>{polizaData.contratante}</p>
                 </BodyRow>
                 <BodyRow>
                   <p>Día de cobro:</p>
@@ -92,16 +83,16 @@ const Modal: React.FC<ModalProps> = ({
                     Calle y numero: {polizaData.direccion.calle} | Colonia:{" "}
                     {polizaData.direccion.colonia} | Estado y ciudad:{" "}
                     {polizaData.direccion.estado}, {polizaData.direccion.ciudad}
-                    . Codigo Postal: {polizaData.direccion.codigo_postal}
+                    . Codigo Postal: {polizaData.direccion.codigoPostal}
                   </p>
                 </BodyRow>
                 <BodyRow>
                   <p>Días para corte:</p>
                   <div>
                     <CounterCard
-                      count={polizaData.haslog === 0 ? '?' : calculateDaysUntilLimit(polizaData.next_payment)}
+                      count={calculateDaysUntilLimit(polizaData.next_payment)}
                       paymentdata={{
-                        asegurador: polizaData.user_uuid,
+                        asegurador: polizaData.agente_uuid,
                         poliza: polizaData.poliza_uuid,
                         paid_period: polizaData.next_payment,
                         num_poliza: polizaData.num_poliza
