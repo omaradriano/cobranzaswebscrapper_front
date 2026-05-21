@@ -7,7 +7,7 @@ import {
 } from "../styles/CssComponents";
 import type { CardType } from "../Types/types";
 import Icon from "./icon";
-import { AlertContext } from "../Context/ContextConfig";
+import { AlertContext, AuthContext } from "../Context/ContextConfig";
 
 export interface SpanCardProps {
   label?: string;
@@ -40,6 +40,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const alertContext = useContext(AlertContext);
+  const auth = useContext(AuthContext);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -80,7 +81,18 @@ const CounterCard: React.FC<SpanCardProps> = ({
                 paid_period: paymentdata.paid_period,
                 asegurador: paymentdata.asegurador,
               }),
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('session_jwt')}`
+              }
             };
+
+            console.log({
+                poliza: paymentdata.poliza,
+                paid_period: paymentdata.paid_period,
+                agente: auth?.session?.agente_uuid,
+              });
+
+            // return 
 
             alertContext?.setAlertOptions({
               title: "Confirmación de pago",
@@ -90,7 +102,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
                 try {
                   //Aqui se hace la peticion para verificar confirmacion de pago
                   const response = await fetch(
-                    "http://localhost:3006/v1/cobranzaItemPayment",
+                    "http://localhost:3006/v1/payments/poliza",
                     options,
                   );
                   const res = await response.json();
