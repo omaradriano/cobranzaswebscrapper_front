@@ -204,7 +204,7 @@ const Dashboard: React.FC = () => {
 
           <StatTag
             amount={detailsData?.payload.por_vencer ?? 0}
-            title="Por vencer"
+            title="Por vencer o fecha superada"
             type="Warning"
             filter={() => {
               setFilters({
@@ -342,5 +342,7 @@ const DashboardText = styled.p<{
 }>`
   color: ${(p) => (p.$theme === "Dark" ? "#999" : "#000")};
 `;
-
+export {
+  DashboardHeader, DashboardTitle, DashboardText, DashboardContainer
+}
 export default Dashboard;

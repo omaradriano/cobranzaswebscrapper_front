@@ -5,10 +5,10 @@ import Icon from "./icon";
 import { useContext } from "react";
 import {
   AuthContext,
-  UserModeContext,
+  // UserModeContext,
   type UserMode,
 } from "../Context/ContextConfig";
-import { UserModeTag } from "./NoFunctional";
+// import { UserModeTag } from "./NoFunctional";
 import {
   borderTheme__css,
   headerTheme,
@@ -26,7 +26,7 @@ export interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
-  const userMode = useContext(UserModeContext);
+  // const userMode = useContext(UserModeContext);
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
@@ -47,14 +47,16 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
         {/* VISTA CON SESIÓN ACTIVA */}
         {isAuthenticated ? (
           <>
+            <CustomNavLink to={"/dashboard"}>Dashboard</CustomNavLink>
+            <CustomNavLink to={"/calendar"}>Calendario</CustomNavLink>
             <UserData $usertype={userType}>
               <p>{auth?.session?.email}</p>
-              <UserModeTag $usertype={userMode ?? "Demo"}>
+              {/* <UserModeTag $usertype={userMode ?? "Demo"}>
                 {userMode ?? "Demo"}
-              </UserModeTag>
+              </UserModeTag> */}
             </UserData>
 
-            <Icon iconName="Settings" size={24} isButton={true} />
+            {/* <Icon iconName="Settings" size={24} isButton={true} /> */}
 
             <Icon
               iconName="Logout"
@@ -126,6 +128,11 @@ const DesktopView = styled.div`
     display: flex;
   }
 `;
+
+const CustomNavLink = styled(NavLink)`
+  text-decoration: none;
+  color: #2727f2
+`
 
 const UserData = styled.div<{ $usertype: UserMode }>`
   display: flex;

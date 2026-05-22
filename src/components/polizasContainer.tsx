@@ -116,7 +116,7 @@ const PolizasContainerCustom = styled.div`
   padding: 0px 0;
   /* ${headerTheme} */
   border-radius: 8px;
-  height: calc(100vh - 330px);
+  height: calc(100vh - 350px);
   overflow-y: auto;
   /* padding: 40px 10px; */
   /* align-items: center; */

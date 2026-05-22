@@ -8,6 +8,7 @@ import { ThemeContext, type PreferedScheme } from "./Context/ContextConfig";
 import AuthView from "./components/authview";
 import { Route, Routes } from "react-router";
 import Home from "./components/home";
+import Calendar from "./components/calendar/Calendar";
 
 function App() {
   return (
@@ -28,9 +29,8 @@ function App() {
         <Route path="auth/loggedin" element={<AuthView mode="LoggedIn"/>}></Route>
         <Route path="auth/emailsended" element={<AuthView mode="EmailSended"/>}></Route>
         <Route path="auth/verifiedaccount" element={<AuthView mode="Verified"/>}></Route>
+        <Route path="calendar" element={<Calendar />}></Route>
       </Routes>
-      {/* <AuthView /> */}
-      {/* <Dashboard /> */}
     </ContextProvider>
   );
 }
