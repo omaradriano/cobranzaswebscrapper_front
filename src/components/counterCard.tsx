@@ -102,7 +102,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
                 try {
                   //Aqui se hace la peticion para verificar confirmacion de pago
                   const response = await fetch(
-                    "http://localhost:3006/v1/payments/poliza",
+                    `${import.meta.env.VITE_API_SERVER_URL}/v1/payments/poliza`,
                     options,
                   );
                   const res = await response.json();

@@ -19,7 +19,7 @@ const SignInForm: React.FC = () => {
     password: string;
   }) {
     const auth_res = await fetch(
-      "http://localhost:3006/v1/auth/authenticate/manual",
+      `${import.meta.env.VITE_API_SERVER_URL}/v1/auth/authenticate/manual`,
       {
         method: "POST",
         headers: {
@@ -39,7 +39,7 @@ const SignInForm: React.FC = () => {
       localStorage.setItem("session_jwt", auth_data.payload.jwt_token);
 
       const session_req = await fetch(
-        "http://localhost:3006/v1/auth/checkSession",
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/auth/checkSession`,
         {
           method: "GET",
           headers: {

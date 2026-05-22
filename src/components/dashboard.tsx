@@ -77,7 +77,7 @@ const Dashboard: React.FC = () => {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:3006/v1/scrapping/polizas?pageSize=10&currentPage=${currentPage}${query_params}`,
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/polizas?pageSize=10&currentPage=${currentPage}${query_params}`,
         {
           headers: {
             Authorization: `Bearer ${session_token}`,
@@ -106,7 +106,7 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:3006/v1/scrapping/details", {
+      const res = await fetch(`${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/details`, {
         headers: {
           Authorization: `Bearer ${session_token}`,
         },

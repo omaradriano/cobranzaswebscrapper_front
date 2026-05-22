@@ -61,7 +61,7 @@ const CalendarComp: React.FC = () => {
 
         const jwt = localStorage.getItem("session_jwt");
         const calendar_data = await fetch(
-          `http://127.0.0.1:3006/v1/polizas/birthdates`,
+          `${import.meta.env.VITE_API_SERVER_URL}/v1/polizas/birthdates`,
           {
             headers: {
               Authorization: `Bearer ${jwt}`,

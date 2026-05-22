@@ -92,7 +92,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
       console.log(payload);
 
       const response = await fetch(
-        `http://localhost:3006/v1/auth/setpassword?token=${token}`,
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/auth/setpassword?token=${token}`,
         {
           method: "POST",
           headers: {

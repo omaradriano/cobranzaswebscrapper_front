@@ -78,7 +78,7 @@ const SignUpForm: React.FC = () => {
   // 5. Lógica de envío al servidor
   const handleRegister = async () => {
     try {
-      const response = await fetch("http://localhost:3006/v1/auth/register", {
+      const response = await fetch(`${import.meta.env.VITE_API_SERVER_URL}/v1/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

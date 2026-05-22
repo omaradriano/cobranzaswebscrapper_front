@@ -51,7 +51,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const session_req = await fetch(
-        "http://localhost:3006/v1/auth/checkSession",
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/auth/checkSession`,
         {
           method: "GET",
           headers: {

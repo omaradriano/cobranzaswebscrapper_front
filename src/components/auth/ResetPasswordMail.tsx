@@ -16,7 +16,7 @@ const ResetPasswordMail: React.FC = () => {
     console.log("Correo de restablecimiento enviado");
 
     const resetpassflow = await fetch(
-      "http://localhost:3006/v1/auth/resetpasswordmail",
+      `${import.meta.env.VITE_API_SERVER_URL}/v1/auth/resetpasswordmail`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
