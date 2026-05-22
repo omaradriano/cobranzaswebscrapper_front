@@ -106,11 +106,14 @@ const Dashboard: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/details`, {
-        headers: {
-          Authorization: `Bearer ${session_token}`,
+      const res = await fetch(
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/details`,
+        {
+          headers: {
+            Authorization: `Bearer ${session_token}`,
+          },
         },
-      });
+      );
 
       const data = await res.json();
 
@@ -124,17 +127,16 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       const filtersString = convertFiltersToString(filters);
-
       const data = await fetchPolizas(filtersString);
 
       if (data?.payload) {
         setPolizasData(data.payload.items);
-
         setMaxPages(data.payload.pages || 1);
       }
     };
 
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, filters]);
 
   useEffect(() => {
@@ -147,7 +149,8 @@ const Dashboard: React.FC = () => {
     };
 
     loadDetails();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 👈 AGREGADO '[]': Ahora solo se ejecuta UNA VEZ al montar el componente
 
   return (
     <DashboardContainer>
@@ -342,7 +345,5 @@ const DashboardText = styled.p<{
 }>`
   color: ${(p) => (p.$theme === "Dark" ? "#999" : "#000")};
 `;
-export {
-  DashboardHeader, DashboardTitle, DashboardText, DashboardContainer
-}
+export { DashboardHeader, DashboardTitle, DashboardText, DashboardContainer };
 export default Dashboard;

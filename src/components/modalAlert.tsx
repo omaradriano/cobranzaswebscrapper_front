@@ -71,30 +71,6 @@ const AlertMessage = styled.div`
   align-items: center;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BodyRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  /* background-color: red; */
-  padding: 5px 0;
-
-  & > p {
-    display: flex;
-    width: 100%;
-    ${textTheme__css}
-  }
-
-  & > div {
-    display: flex;
-    width: 100%;
-  }
-
-  & > p:nth-child(1) {
-    color: #7c7c7cc4;
-    width: clamp(100px, 35%, 300px);
-  }
-`;
 
 const ModalShadow = styled.div`
   position: absolute;

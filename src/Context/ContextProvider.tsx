@@ -77,7 +77,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     verifySession();
-  }, []);
+  }, [navigate]);
 
   return (
     <>

@@ -83,7 +83,6 @@ const PolizasItems = styled.div`
   gap: 5px;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PolizasItemsHeader = styled.div`
   display: flex;
   flex-direction: row;
