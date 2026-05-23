@@ -47,6 +47,7 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
         {/* VISTA CON SESIÓN ACTIVA */}
         {isAuthenticated ? (
           <>
+            <CustomNavLink to={"/privacy"}>Politica de privacidad</CustomNavLink>
             <CustomNavLink to={"/dashboard"}>Dashboard</CustomNavLink>
             <CustomNavLink to={"/calendar"}>Calendario</CustomNavLink>
             <UserData $usertype={userType}>

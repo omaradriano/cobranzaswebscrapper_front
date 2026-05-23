@@ -9,6 +9,7 @@ import AuthView from "./components/authview";
 import { Route, Routes } from "react-router";
 import Home from "./components/home";
 import Calendar from "./components/calendar/Calendar";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="auth/emailsended" element={<AuthView mode="EmailSended"/>}></Route>
         <Route path="auth/verifiedaccount" element={<AuthView mode="Verified"/>}></Route>
         <Route path="calendar" element={<Calendar />}></Route>
+        <Route path="privacy" element={<PrivacyPolicy />}></Route>
       </Routes>
     </ContextProvider>
   );
