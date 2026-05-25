@@ -44,13 +44,10 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
       {/* <ThemeToggle /> */}
 
       <DesktopView>
-        <CustomNavLink to={"/privacy"}>
-              Politica de privacidad
-            </CustomNavLink>
+        <CustomNavLink to={"/privacy"}>Politica de privacidad</CustomNavLink>
         {/* VISTA CON SESIÓN ACTIVA */}
         {isAuthenticated ? (
           <>
-            
             <CustomNavLink to={"/dashboard"}>Dashboard</CustomNavLink>
             <CustomNavLink to={"/calendar"}>Calendario</CustomNavLink>
             <UserData $usertype={userType}>
@@ -77,9 +74,6 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
         ) : (
           /* VISTA SIN SESIÓN */
           <>
-            <CustomNavLink to={"/privacy"}>
-              Politica de privacidad
-            </CustomNavLink>
             <LoginLink to="/auth/signin">Iniciar sesión</LoginLink>
           </>
         )}

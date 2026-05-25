@@ -21,7 +21,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
         return savedTheme;
       }
     }
-    return "Dark";
+    return { themeMode: "Light" };
   });
 
   const themeValues = {
@@ -29,12 +29,13 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     text: theme === "Dark" ? "#fff" : "black",
   };
 
-  const { alertOptions, setAlertOptions, showAlert, setShowAlert } = useModalAlert();
+  const { alertOptions, setAlertOptions, showAlert, setShowAlert } =
+    useModalAlert();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [session, setSession] = useState<session_claims | null>(null);
-  
+
   // 💡 Estado para saber si ya terminamos de validar la sesión y no renderizar a ciegas
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation(); // 💡 Para saber en qué ruta está parado el usuario
@@ -44,13 +45,16 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       const session_token = localStorage.getItem("session_jwt");
 
       // 💡 Rutas públicas donde NO queremos redirigir a /home si no hay token
-      const isPublicRoute = location.pathname === "/home" || location.pathname === "/auth/signin" || location.pathname === '/privacy';
+      const isPublicRoute =
+        location.pathname === "/home" ||
+        location.pathname === "/auth/signin" ||
+        location.pathname === "/privacy";
 
       if (!session_token) {
         setIsAuthenticated(false);
         setSession(null);
         setLoading(false);
-        
+
         // Solo redirige si intenta entrar a una ruta protegida (ej: /dashboard)
         if (!isPublicRoute) {
           navigate("/home");
@@ -67,15 +71,18 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${session_token}`,
             },
-          }
+          },
         );
 
         if (!session_req.ok) {
           throw new Error("Token inválido o expirado en el servidor");
         }
 
-        const session_data: { success: boolean; payload: session_claims; message?: string } =
-          await session_req.json();
+        const session_data: {
+          success: boolean;
+          payload: session_claims;
+          message?: string;
+        } = await session_req.json();
 
         if (!session_data.success) {
           console.error("Error al verificar sesión:", session_data.message);
@@ -107,7 +114,9 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, session, setSession }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, setIsAuthenticated, session, setSession }}
+    >
       <ThemeContext.Provider value={{ theme, setTheme }}>
         <ThemeProvider theme={themeValues as DefaultTheme}>
           <UserModeContext.Provider value={"Admin"}>

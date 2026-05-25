@@ -149,7 +149,7 @@ const PrivacyPolicy: React.FC = () => {
 };
 
 const PrivacyContainer = styled.div`
-  padding: 10px 4vw;
+  padding: 15px 8vw 40px 8vw;;
 `;
 
 const PrivacySection = styled.div`
