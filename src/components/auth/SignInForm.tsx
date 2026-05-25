@@ -10,8 +10,8 @@ const SignInForm: React.FC = () => {
   const auth = useContext(AuthContext);
 
   const [credentials, setCredentials] = React.useState({
-    email: "oadrian38@gmail.com",
-    password: "Omaradriano.1",
+    email: "",
+    password: "",
   });
 
   async function handleSignIn(credentials: {

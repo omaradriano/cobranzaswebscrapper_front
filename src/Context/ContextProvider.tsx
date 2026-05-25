@@ -44,7 +44,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       const session_token = localStorage.getItem("session_jwt");
 
       // 💡 Rutas públicas donde NO queremos redirigir a /home si no hay token
-      const isPublicRoute = location.pathname === "/home" || location.pathname === "/auth/signin";
+      const isPublicRoute = location.pathname === "/home" || location.pathname === "/auth/signin" || location.pathname === '/privacy';
 
       if (!session_token) {
         setIsAuthenticated(false);

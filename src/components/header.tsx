@@ -44,10 +44,13 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
       {/* <ThemeToggle /> */}
 
       <DesktopView>
+        <CustomNavLink to={"/privacy"}>
+              Politica de privacidad
+            </CustomNavLink>
         {/* VISTA CON SESIÓN ACTIVA */}
         {isAuthenticated ? (
           <>
-            <CustomNavLink to={"/privacy"}>Politica de privacidad</CustomNavLink>
+            
             <CustomNavLink to={"/dashboard"}>Dashboard</CustomNavLink>
             <CustomNavLink to={"/calendar"}>Calendario</CustomNavLink>
             <UserData $usertype={userType}>
@@ -73,12 +76,45 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
           </>
         ) : (
           /* VISTA SIN SESIÓN */
-          <LoginLink to="/auth/signin">Iniciar sesión</LoginLink>
+          <>
+            <CustomNavLink to={"/privacy"}>
+              Politica de privacidad
+            </CustomNavLink>
+            <LoginLink to="/auth/signin">Iniciar sesión</LoginLink>
+          </>
         )}
       </DesktopView>
 
       <MobileView>
-        <Icon iconName="Menu" size={40} isButton={true} />
+        {/* <Icon iconName="Menu" size={40} isButton={true} /> */}
+
+        {!isAuthenticated ? (
+          <>
+            <CustomNavLink to={"/privacy"}>
+              Politica de privacidad
+            </CustomNavLink>
+            <LoginLink to="/auth/signin">Iniciar sesión</LoginLink>
+          </>
+        ) : (
+          <HeaderContainerMobile>
+            <CustomNavLink to={"/privacy"}>
+              Politica de privacidad
+            </CustomNavLink>
+            <CustomNavLink to={"/dashboard"}>Dashboard</CustomNavLink>
+            <CustomNavLink to={"/calendar"}>Calendario</CustomNavLink>
+            <Icon
+              iconName="Logout"
+              size={24}
+              isButton={true}
+              action={() => {
+                localStorage.removeItem("session_jwt");
+                auth?.setSession(null);
+                auth?.setIsAuthenticated(false); // Asegúrate de apagar tu bandera global de auth si la usas
+                navigate("/home");
+              }}
+            />
+          </HeaderContainerMobile>
+        )}
       </MobileView>
     </HeaderMain>
   );
@@ -130,10 +166,17 @@ const DesktopView = styled.div`
   }
 `;
 
+const HeaderContainerMobile = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+`;
+
 const CustomNavLink = styled(NavLink)`
   text-decoration: none;
-  color: #2727f2
-`
+  color: #2727f2;
+`;
 
 const UserData = styled.div<{ $usertype: UserMode }>`
   display: flex;
