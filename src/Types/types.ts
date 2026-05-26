@@ -10,7 +10,7 @@ export type PolizaGetItem = {
   num_poliza: string;
   plan: string;
   tipo_seguro: string;
-  asegurados: [{ nombre: string; is_principal: boolean; birthday: string }];
+  asegurados: [ string : { nombre: string; is_principal: boolean; birthday: string, numpoliza: string } ];
   moneda: string;
   pais: string;
   email: string;
@@ -24,32 +24,8 @@ export type PolizaGetItem = {
   };
   next_payment: string;
   poliza_uuid: string;
-  agente_uuid: string;
+  payment_exist: string
 };
-
-// export type PolizaGetItem = {
-//   asegurado: string;
-//   contratante: string;
-//   diaCobro: number;
-//   estatus: StatusValues;
-//   fecha_emision: string;
-//   forma_pago: string;
-//   medio_cobro: string;
-//   num_poliza: string;
-//   plan: string;
-//   tipo_seguro: string;
-//   direccion: {
-//     calle: string;
-//     codigo_postal: string;
-//     ciudad: string;
-//     estado: string;
-//     colonia: string;
-//   };
-//   next_payment: string;
-//   poliza_uuid: string;
-//   user_uuid: string;
-//   haslog: number;
-// };
 
 export type StatusValues = "En Vigor" | "Anulada";
 
@@ -78,7 +54,6 @@ declare module "styled-components" {
   export interface DefaultTheme {
     mode: PreferedScheme;
     text: string;
-    // Agrega aquí cualquier otra propiedad que hayas puesto en themeValues
   }
 }
 

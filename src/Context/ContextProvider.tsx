@@ -4,6 +4,7 @@ import {
   ThemeContext,
   UserModeContext,
   AuthContext,
+  DataChangedContext,
 } from "./ContextConfig";
 import { useEffect, useState } from "react";
 import type { DefaultTheme } from "styled-components/dist/types";
@@ -33,6 +34,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     useModalAlert();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [session, setSession] = useState<session_claims | null>(null);
+  const [dataHasChanged, setDataHasChanged] = useState<number>(0);
 
   // 💡 Estado para saber si ya terminamos de validar la sesión y no renderizar a ciegas
   const [loading, setLoading] = useState(true);
@@ -118,20 +120,22 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       value={{ isAuthenticated, setIsAuthenticated, session, setSession }}
     >
       <ThemeContext.Provider value={{ theme, setTheme }}>
-        <ThemeProvider theme={themeValues as DefaultTheme}>
-          <UserModeContext.Provider value={"Admin"}>
-            <AlertContext.Provider
-              value={{
-                alertOptions,
-                setAlertOptions,
-                showAlert,
-                setShowAlert,
-              }}
-            >
-              {children}
-            </AlertContext.Provider>
-          </UserModeContext.Provider>
-        </ThemeProvider>
+        <DataChangedContext.Provider value={{ dataHasChanged, setDataHasChanged }}>
+          <ThemeProvider theme={themeValues as DefaultTheme}>
+            <UserModeContext.Provider value={"Admin"}>
+              <AlertContext.Provider
+                value={{
+                  alertOptions,
+                  setAlertOptions,
+                  showAlert,
+                  setShowAlert,
+                }}
+              >
+                {children}
+              </AlertContext.Provider>
+            </UserModeContext.Provider>
+          </ThemeProvider>
+        </DataChangedContext.Provider>
       </ThemeContext.Provider>
     </AuthContext.Provider>
   );

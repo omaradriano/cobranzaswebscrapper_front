@@ -137,6 +137,10 @@ const HeaderMain = styled.div`
   @media (min-width: 540px) {
     padding: 1rem 4vw;
   }
+
+  & > * {
+    text-align: center;
+  }
 `;
 
 const HeaderImg = styled.img`

@@ -75,7 +75,8 @@ const CalendarComp: React.FC = () => {
           // Mapeamos los strings ISO de Go a objetos Date nativos de JavaScript
           const formattedEvents: CalendarEvent[] = response.payload.map(
             (item: BirthdatePayload) => {
-              const dateObj = new Date(item.birthdate);
+              const dateObj = new Date(item.birthdate); // Ajuste de un día para corregir desfase de Go a JS
+              dateObj.setDate(dateObj.getDate() + 1); // Ajuste de un día para corregir desfase de Go a JS
               return {
                 title: `🎂 ${item.nombrecompleto}`,
                 start: dateObj,

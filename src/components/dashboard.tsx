@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   AuthContext,
+  DataChangedContext,
   ThemeContext,
   type PreferedScheme,
 } from "../Context/ContextConfig";
@@ -26,6 +27,7 @@ import { useNavigate } from "react-router";
 const Dashboard: React.FC = () => {
   const theme = useContext(ThemeContext);
   const auth = useContext(AuthContext);
+  const dataChanged = useContext(DataChangedContext);
   const navigate = useNavigate();
 
   const [polizasData, setPolizasData] = useState<PolizaGetItem[]>([]);
@@ -35,7 +37,9 @@ const Dashboard: React.FC = () => {
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
   const [maxPages, setMaxPages] = useState(1);
 
-  // 💡 SE CAMBIÓ EL ESTADO INICIAL: Inicializamos el payload en 0 para evitar validar nulls de forma compleja
+  const [showAnuladasFilter, setAnuladasFilter] = useState(false);
+  const [showAnuladasCheckbox, setShowAnuladasCheckbox] = useState(true);
+
   const [detailsData, setDetailsData] = useState<{
     total: number;
     activas: number;
@@ -73,7 +77,7 @@ const Dashboard: React.FC = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/polizas?pageSize=10&currentPage=${currentPage}${query_params}`,
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/polizas?pageSize=20&currentPage=${currentPage}${query_params}`,
         { headers: { Authorization: `Bearer ${session_token}` } },
       );
       const data = await res.json();
@@ -102,7 +106,6 @@ const Dashboard: React.FC = () => {
       );
       const data = await res.json();
 
-      // 💡 CORRECCIÓN: Validamos explícitamente que la API responda con éxito y traiga el payload
       if (data && data.success && data.payload) {
         return data.payload;
       }
@@ -115,7 +118,10 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const filtersString = convertFiltersToString(filters);
+      const filtersString = convertFiltersToString({
+        ...filters,
+        show_anuladas: showAnuladasFilter ? "true" : "false",
+      });
       const data = await fetchPolizas(filtersString);
       if (data?.payload) {
         setPolizasData(data.payload.items);
@@ -124,18 +130,24 @@ const Dashboard: React.FC = () => {
     };
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, filters]);
+  }, [currentPage, filters, showAnuladasFilter, dataChanged?.dataHasChanged]);
 
   useEffect(() => {
     const loadDetails = async () => {
       const payload = await getPolizasDetails();
       if (payload) {
-        setDetailsData(payload); // 💡 Ahora guardamos directamente el objeto seguro con los números
+        setDetailsData(payload);
       }
     };
     loadDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dataChanged?.dataHasChanged]);
+
+  // 💡 FUNCIÓN AGREGADA: Maneja el cambio de estado nativo del input de forma segura
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAnuladasFilter(e.target.checked);
+    setCurrentPage(1); 
+  };
 
   return (
     <DashboardContainer>
@@ -158,6 +170,8 @@ const Dashboard: React.FC = () => {
               setFilters({});
               setCurrentPage(1);
               setSearchValue("");
+              setAnuladasFilter(false);
+              setShowAnuladasCheckbox(true)
             }}
           />
 
@@ -166,9 +180,10 @@ const Dashboard: React.FC = () => {
             title="Activas"
             type="Success"
             filter={() => {
-              setCurrentPage(1); // 💡 Establecemos la página primero para evitar desincronizaciones
+              setCurrentPage(1);
               setFilters({ estatus: "En Vigor" });
               setSearchValue("");
+              setShowAnuladasCheckbox(false);
             }}
           />
 
@@ -180,6 +195,8 @@ const Dashboard: React.FC = () => {
               setCurrentPage(1);
               setFilters({ estatus: "Anulada" });
               setSearchValue("");
+              setAnuladasFilter(false);
+              setShowAnuladasCheckbox(false);
             }}
           />
 
@@ -191,17 +208,35 @@ const Dashboard: React.FC = () => {
               setCurrentPage(1);
               setFilters({ next_due: "true" });
               setSearchValue("");
+              setAnuladasFilter(false)
+              setShowAnuladasCheckbox(true);
             }}
           />
         </StatContainer>
 
-        <SearchBar
-          stateValue={filters}
-          stateChangeValue={setFilters}
-          setCurrentPage={setCurrentPage}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-        />
+        <MoreFiltersSection>
+          <SearchBar
+            stateValue={filters}
+            stateChangeValue={setFilters}
+            setCurrentPage={setCurrentPage}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+          />
+
+          {/* 💡 ACTUALIZADO: Componente conectado con estados y propiedades correspondientes */}
+          {showAnuladasCheckbox ? (
+            <FilterAnuladas htmlFor="hideCanceled">
+              <input
+                type="checkbox"
+                id="hideCanceled"
+                checked={showAnuladasFilter}
+                onChange={handleCheckboxChange}
+              />
+              <span />
+              Ocultar anuladas
+            </FilterAnuladas>
+          ) : null}
+        </MoreFiltersSection>
 
         <PaginationRow>
           <Icon
@@ -254,7 +289,6 @@ const Dashboard: React.FC = () => {
   );
 };
 
-// ... Tus estilos de Styled Components se quedan exactamente igual ...
 const PaginationRow = styled.div`
   display: flex;
   align-items: center;
@@ -291,6 +325,75 @@ const AppliedChangesHeader = styled.div`
 `;
 
 const DashboardHeader = styled.div``;
+
+const MoreFiltersSection = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+// 💡 CORRECCIÓN COMPLETA DE ESTILOS: Asegura centrado perfecto Flexbox y proporciones estables en 28px
+const FilterAnuladas = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-family: sans-serif;
+  color: #333333;
+
+  & > input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  & > span {
+    display: flex; /* Flexbox para centrar matemáticamente la palomita */
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+    border: 2px solid #b3b3b3;
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s ease-in-out;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+    &::after {
+      content: "";
+      width: 6px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 3px 3px 0; /* Grosor ideal de 3px para balance visual */
+      transform: rotate(45deg) translateY(-1px);
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+    }
+  }
+
+  &:hover > input ~ span {
+    border-color: #4b7bec;
+  }
+
+  & > input:checked ~ span {
+    background-color: #4b7bec;
+    border-color: #4b7bec;
+  }
+
+  & > input:checked ~ span::after {
+    opacity: 1; /* Hace visible la palomita */
+  }
+
+  & > input:focus-visible ~ span {
+    box-shadow: 0 0 0 3px rgba(75, 123, 236, 0.25);
+  }
+`;
 
 const DashboardBody = styled.div`
   display: flex;

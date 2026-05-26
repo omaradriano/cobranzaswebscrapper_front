@@ -24,3 +24,8 @@ export const AuthContext = createContext<{
   session: session_claims | null;
   setSession: React.Dispatch<React.SetStateAction<session_claims | null>>;
 } | null>(null);
+
+export const DataChangedContext = createContext<{
+  dataHasChanged: number,
+  setDataHasChanged: React.Dispatch<React.SetStateAction<number>>;
+} | null>(null)

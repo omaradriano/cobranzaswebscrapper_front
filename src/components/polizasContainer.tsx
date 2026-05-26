@@ -54,6 +54,7 @@ const PolizasContainer: React.FC<PolizasContainerProps> = ({
           {!isMobile ? (
             <PolizasItemsHeader>
               <p>No. Poliza</p>
+              <p>Asegurado principal</p>
               <p>Producto</p>
               <p>Estatus</p>
               <p>Días para corte</p>
@@ -91,6 +92,10 @@ const PolizasItemsHeader = styled.div`
   /* background-color: white; */
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #e3ebfd;
 
   & p {
     flex: 1;
@@ -115,7 +120,7 @@ const PolizasContainerCustom = styled.div`
   padding: 0px 0;
   /* ${headerTheme} */
   border-radius: 8px;
-  height: calc(100vh - 350px);
+  height: calc(100vh - 380px);
   overflow-y: auto;
   /* padding: 40px 10px; */
   /* align-items: center; */

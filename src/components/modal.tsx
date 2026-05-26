@@ -26,7 +26,6 @@ const Modal: React.FC<ModalProps> = ({
   setModalOpen,
   polizaData,
 }) => {
-
   return (
     <>
       {modalOpen &&
@@ -48,6 +47,26 @@ const Modal: React.FC<ModalProps> = ({
                 <BodyRow>
                   <p>No. de poliza:</p>
                   <p>{polizaData.num_poliza}</p>
+                </BodyRow>
+                <BodyRow>
+                  <p>Asegurado principal:</p>
+                  <p>
+                    {
+                      polizaData.asegurados.filter(
+                        (elem) => elem.is_principal,
+                      )[0].nombre
+                    }
+                  </p>
+                </BodyRow>
+                <BodyRow>
+                  <p>Asegurados:</p>
+                  <ul>
+                    <li style={{ display: "flex", flexDirection: "column" }}>
+                      {polizaData.asegurados.map((elem, index) => {
+                        return <span key={index}>{elem.nombre}</span>;
+                      })}
+                    </li>
+                  </ul>
                 </BodyRow>
                 <BodyRow>
                   <p>Día de cobro:</p>
@@ -90,12 +109,12 @@ const Modal: React.FC<ModalProps> = ({
                   <p>Días para corte:</p>
                   <div>
                     <CounterCard
+                      // includePayment
                       count={calculateDaysUntilLimit(polizaData.next_payment)}
                       paymentdata={{
-                        asegurador: polizaData.agente_uuid,
                         poliza: polizaData.poliza_uuid,
                         paid_period: polizaData.next_payment,
-                        num_poliza: polizaData.num_poliza
+                        num_poliza: polizaData.num_poliza,
                       }}
                     ></CounterCard>
                   </div>
@@ -137,6 +156,11 @@ const BodyRow = styled.div`
     width: 100%;
   }
 
+  & > ul {
+    display: flex;
+    width: 100%;
+  }
+
   & > p:nth-child(1) {
     color: #7c7c7cc4;
     width: clamp(100px, 35%, 300px);
@@ -153,6 +177,7 @@ const ModalShadow = styled.div`
   background-color: #04040454;
   height: 100%;
   width: 100%;
+  z-index: 100000;
 `;
 
 const ModalContent = styled.div`

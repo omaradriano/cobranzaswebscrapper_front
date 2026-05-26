@@ -7,15 +7,19 @@ import {
 } from "../styles/CssComponents";
 import type { CardType } from "../Types/types";
 import Icon from "./icon";
-import { AlertContext, AuthContext } from "../Context/ContextConfig";
+import {
+  AlertContext,
+  AuthContext,
+  DataChangedContext,
+} from "../Context/ContextConfig";
 
 export interface SpanCardProps {
   label?: string;
   count: number | string;
+  includePayment?: boolean;
   paymentdata: {
     poliza: string;
     paid_period: string;
-    asegurador: string;
     num_poliza: string;
   };
 }
@@ -34,6 +38,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
   label,
   count,
   paymentdata,
+  includePayment = false,
 }) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
 
@@ -41,6 +46,8 @@ const CounterCard: React.FC<SpanCardProps> = ({
 
   const alertContext = useContext(AlertContext);
   const auth = useContext(AuthContext);
+
+  const dataChanged = useContext(DataChangedContext);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,15 +69,34 @@ const CounterCard: React.FC<SpanCardProps> = ({
   return (
     <CounterCardCustom
       ref={containerRef}
-      $type={DefineCounterColor(count, 5)}
+      $type={!includePayment ? "Default" : DefineCounterColor(count, 5)}
       onClick={() => {
         setShowOptions(true);
       }}
     >
-      <p>
-        {label ?? ""} {label ? ":" : ""} <span>{count}</span>
-        <Icon iconName="MoreHoriz" size={24} isButton></Icon>
-      </p>
+      {!includePayment ? (
+        <NoRegisterPaymentLabel>
+          <p style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            {label ?? ""} {label ? ":" : ""}{" "}
+            <span style={{ fontSize: "22px", width: "max-content" }}>
+              {count}
+            </span>
+            <Icon
+              iconName="Warning"
+              size={24}
+              isButton={true}
+              customColor="#fb8d0f"
+            ></Icon>
+          </p>
+          {/* <p>Este registro no tiene pago registrado previo</p> */}
+        </NoRegisterPaymentLabel>
+      ) : (
+        <p>
+          {label ?? ""} {label ? ":" : ""} <span>{count}</span>
+          <Icon iconName="MoreHoriz" size={24} isButton></Icon>
+        </p>
+      )}
+
       <CounterCardOptions $isVisible={showOptions}>
         <CounterCardOption
           onClick={async () => {
@@ -79,20 +105,19 @@ const CounterCard: React.FC<SpanCardProps> = ({
               body: JSON.stringify({
                 poliza: paymentdata.poliza,
                 paid_period: paymentdata.paid_period,
-                asegurador: paymentdata.asegurador,
               }),
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('session_jwt')}`
-              }
+                Authorization: `Bearer ${localStorage.getItem("session_jwt")}`,
+              },
             };
 
             console.log({
-                poliza: paymentdata.poliza,
-                paid_period: paymentdata.paid_period,
-                agente: auth?.session?.agente_uuid,
-              });
+              poliza: paymentdata.poliza,
+              paid_period: paymentdata.paid_period,
+              agente: auth?.session?.agente_uuid,
+            });
 
-            // return 
+            // return
 
             alertContext?.setAlertOptions({
               title: "Confirmación de pago",
@@ -109,6 +134,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
                   if (res.code !== 202) {
                     throw new Error(res.message);
                   }
+                  dataChanged?.setDataHasChanged((prev) => prev + 1);
                   alertContext.setAlertOptions({
                     message: "Se ha completado el pago",
                     title: "Pago confirmado",
@@ -158,9 +184,9 @@ const CounterCardOption = styled.p`
 const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
   display: ${(p) => (p.$isVisible ? "flex" : "none")};
   position: absolute;
-  right: 50%;
-  top: -46px;
-  transform: translate(50%, 0);
+  right: 105%;
+  top: -4px;
+  /* transform: translate(50%, 0); */
   ${CardComponent__SC}
   padding: 5px 5px;
   height: fit-content;
@@ -201,6 +227,16 @@ const CounterCardCustom = styled.div<{ $type: CardType }>`
       font-size: 22px;
     }
   }
+`;
+
+const NoRegisterPaymentLabel = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  ${textTheme__css}
+  font-size: clamp(14px, 1.5vw, 1rem);
+  color: #000000b0;
 `;
 
 export default CounterCard;
