@@ -48,10 +48,10 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
 
       // 💡 Rutas públicas donde NO queremos redirigir a /home si no hay token
       const isPublicRoute =
-        location.pathname === "/home" ||
-        location.pathname === "/auth/signin" ||
-        location.pathname === "/privacy" ||
-        location.pathname === '/auth/register';
+        location.pathname === "/home" 
+        || location.pathname === "/auth/signin" 
+        || location.pathname === "/privacy" 
+        // || location.pathname === '/auth/register';
 
       if (!session_token) {
         setIsAuthenticated(false);

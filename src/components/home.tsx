@@ -78,6 +78,7 @@ const HeroCTAGroup = styled.div`
   justify-content: center;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PrimaryButton = styled(NavLink)`
   display: inline-flex;
   align-items: center;
@@ -574,7 +575,7 @@ const Home: React.FC = () => {
           pagos pendientes sin tener que preocuparte de comenzar de cero.
         </HeroSubtitle>
         <HeroCTAGroup>
-          <PrimaryButton to="/auth/register">Registrate gratis</PrimaryButton>
+          {/* <PrimaryButton to="/auth/register">Registrate gratis</PrimaryButton> */}
           <SecondaryButton to="/auth/signin">Iniciar sesión</SecondaryButton>
         </HeroCTAGroup>
         <HeroVisual>
@@ -669,7 +670,7 @@ const Home: React.FC = () => {
         <FooterLinks>
           <FooterLink to="/privacy">Privacidad</FooterLink>
           <FooterLink to="/auth/signin">Iniciar sesión</FooterLink>
-          <FooterLink to="/auth/register">Registro</FooterLink>
+          {/* <FooterLink to="/auth/register">Registro</FooterLink> */}
         </FooterLinks>
         <FooterCopy>
           © 2026 Tu Empresa. Todos los derechos reservados.
