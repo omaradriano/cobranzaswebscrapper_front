@@ -67,6 +67,7 @@ const Modal: React.FC<ModalProps> = ({
                 <CounterSection>
                   <CounterCard
                     count={calculateDaysUntilLimit(polizaData.next_payment)}
+                    includePayment={polizaData.payment_exist === "" ? false : true}
                     paymentdata={{
                       poliza: polizaData.poliza_uuid,
                       paid_period: polizaData.next_payment,
@@ -194,7 +195,7 @@ const ModalShadow = styled.div`
   justify-content: center;
   background-color: rgba(4, 4, 4, 0.55);
   backdrop-filter: blur(3px);
-  z-index: 100000;
+  z-index: 10;
 `;
 
 /* ─── Card ────────────────────────────────────────────────────── */
@@ -208,6 +209,7 @@ const ModalContent = styled.div`
   ${sectionTheme__css}
   ${sectionBorderTheme__css}
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.22);
+  z-index: 10;
 `;
 
 /* ─── Header ──────────────────────────────────────────────────── */

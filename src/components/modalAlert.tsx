@@ -82,6 +82,7 @@ const ModalShadow = styled.div`
   background-color: #04040454;
   height: 100%;
   width: 100%;
+  z-index: 10;
 `;
 
 const ModalContent = styled.div`
@@ -95,6 +96,8 @@ const ModalContent = styled.div`
   /* background-color: red; */
   padding: 0 10px;
   ${sectionTheme__css}
+
+  z-index: 100;
 `;
 
 const ModalHeader = styled.div`

@@ -51,6 +51,7 @@ const CounterCard: React.FC<SpanCardProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      console.log(containerRef);
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
@@ -184,8 +185,8 @@ const CounterCardOption = styled.p`
 const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
   display: ${(p) => (p.$isVisible ? "flex" : "none")};
   position: absolute;
-  right: 105%;
-  top: -4px;
+  right: 50%;
+  top: 40px;
   /* transform: translate(50%, 0); */
   ${CardComponent__SC}
   padding: 5px 5px;
@@ -195,6 +196,7 @@ const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
   & > span:hover {
     background-color: white;
   }
+  transform: translateX(50%);
 `;
 
 const CounterCardCustom = styled.div<{ $type: CardType }>`
