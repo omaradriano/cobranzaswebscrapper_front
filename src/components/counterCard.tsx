@@ -64,42 +64,31 @@ const CounterCard: React.FC<SpanCardProps> = ({
     };
   }, []);
 
-  const cardType = !includePayment
-    ? "Default"
-    : DefineCounterColor(count, 5);
+  const cardType = DefineCounterColor(count, 5);
 
   return (
     <CounterCardWrapper ref={containerRef}>
       <CounterCardCustom
         $type={cardType}
-        onClick={() => {
-          if (includePayment) setShowOptions((prev) => !prev);
-        }}
-        $clickable={includePayment}
+        onClick={() => setShowOptions((prev) => !prev)}
+        $clickable={true}
       >
-        {!includePayment ? (
-          <NoPaymentRow>
-            <CountBadge $type="Default">
-              {label && <CountLabel>{label}</CountLabel>}
-              <CountNumber $type="Default">{count}</CountNumber>
-            </CountBadge>
+        <PaymentRow>
+          <CountBadge $type={cardType}>
+            {label && <CountLabel>{label}</CountLabel>}
+            <CountNumber $type={cardType}>{count}</CountNumber>
+          </CountBadge>
+          <DaysLabel>días</DaysLabel>
+          {!includePayment && (
             <Icon
               iconName="Warning"
-              size={18}
+              size={16}
               isButton={false}
               customColor="#fb8d0f"
             />
-          </NoPaymentRow>
-        ) : (
-          <PaymentRow>
-            <CountBadge $type={cardType}>
-              {label && <CountLabel>{label}</CountLabel>}
-              <CountNumber $type={cardType}>{count}</CountNumber>
-            </CountBadge>
-            <DaysLabel>días</DaysLabel>
-            <Icon iconName="MoreVert" size={18} isButton={false} />
-          </PaymentRow>
-        )}
+          )}
+          <Icon iconName="MoreVert" size={18} isButton={false} />
+        </PaymentRow>
       </CounterCardCustom>
 
       {showOptions && (
@@ -216,13 +205,6 @@ const CounterCardCustom = styled.div<{ $type: CardType; $clickable: boolean }>`
 
 /* ─── Row layouts ──────────────────────────────────────────────── */
 const PaymentRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-`;
-
-const NoPaymentRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
