@@ -105,10 +105,7 @@ const Dashboard: React.FC = () => {
         },
       );
       const data = await res.json();
-
-      if (data && data.success && data.payload) {
-        return data.payload;
-      }
+      if (data && data.success && data.payload) return data.payload;
       return null;
     } catch (error) {
       console.error(error);
@@ -135,150 +132,149 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadDetails = async () => {
       const payload = await getPolizasDetails();
-      if (payload) {
-        setDetailsData(payload);
-      }
+      if (payload) setDetailsData(payload);
     };
     loadDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataChanged?.dataHasChanged]);
 
-  // 💡 FUNCIÓN AGREGADA: Maneja el cambio de estado nativo del input de forma segura
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnuladasFilter(e.target.checked);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
+
+  const isDark = theme?.theme === "Dark";
 
   return (
     <DashboardContainer>
       <Alert />
 
+      {/* Page header */}
       <DashboardHeader>
-        <DashboardTitle>Mis pólizas</DashboardTitle>
-        <DashboardText $theme={theme?.theme as PreferedScheme}>
-          Gestiona tus recordatorios de corte de pólizas.
-        </DashboardText>
+        <HeaderLeft>
+          <DashboardTitle>Mis pólizas</DashboardTitle>
+          <DashboardText $theme={theme?.theme as PreferedScheme}>
+            Gestiona tus recordatorios de corte de pólizas.
+          </DashboardText>
+        </HeaderLeft>
       </DashboardHeader>
 
-      <DashboardBody>
-        <StatContainer>
-          <StatTag
-            amount={detailsData.total}
-            title="Total"
-            type="Default"
-            filter={() => {
-              setFilters({});
-              setCurrentPage(1);
-              setSearchValue("");
-              setAnuladasFilter(false);
-              setShowAnuladasCheckbox(true)
-            }}
-          />
-
-          <StatTag
-            amount={detailsData.activas}
-            title="Activas"
-            type="Success"
-            filter={() => {
-              setCurrentPage(1);
-              setFilters({ estatus: "En Vigor" });
-              setSearchValue("");
-              setShowAnuladasCheckbox(false);
-            }}
-          />
-
-          <StatTag
-            amount={detailsData.inactivas}
-            title="Anuladas"
-            type="Danger"
-            filter={() => {
-              setCurrentPage(1);
-              setFilters({ estatus: "Anulada" });
-              setSearchValue("");
-              setAnuladasFilter(false);
-              setShowAnuladasCheckbox(false);
-            }}
-          />
-
-          <StatTag
-            amount={detailsData.por_vencer}
-            title="Por vencer o fecha superada"
-            type="Warning"
-            filter={() => {
-              setCurrentPage(1);
-              setFilters({ next_due: "true" });
-              setSearchValue("");
-              setAnuladasFilter(false)
-              setShowAnuladasCheckbox(true);
-            }}
-          />
-        </StatContainer>
-
-        <MoreFiltersSection>
-          <SearchBar
-            stateValue={filters}
-            stateChangeValue={setFilters}
-            setCurrentPage={setCurrentPage}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-          />
-
-          {/* 💡 ACTUALIZADO: Componente conectado con estados y propiedades correspondientes */}
-          {showAnuladasCheckbox ? (
-            <FilterAnuladas htmlFor="hideCanceled">
-              <input
-                type="checkbox"
-                id="hideCanceled"
-                checked={showAnuladasFilter}
-                onChange={handleCheckboxChange}
-              />
-              <span />
-              Ocultar anuladas
-            </FilterAnuladas>
-          ) : null}
-        </MoreFiltersSection>
-
-        <PaginationRow>
-          <Icon
-            iconName="KeyboardArrowLeft"
-            isButton
-            customColor="#000"
-            size={24}
-            action={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          />
-
-          <PageIndicator>
-            Página {currentPage} de {maxPages}
-          </PageIndicator>
-
-          <Icon
-            iconName="KeyboardArrowRight"
-            isButton
-            customColor="#000"
-            size={24}
-            action={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, maxPages))
-            }
-          />
-        </PaginationRow>
-
-        <PolizasContainer
-          data={polizasData}
-          notificationsNotifier={{
-            stateAction: setPolizasChanged,
-            stateValue: polizasChanged,
+      {/* Stat cards */}
+      <StatContainer>
+        <StatTag
+          amount={detailsData.total}
+          title="Total"
+          type="Default"
+          filter={() => {
+            setFilters({});
+            setCurrentPage(1);
+            setSearchValue("");
+            setAnuladasFilter(false);
+            setShowAnuladasCheckbox(true);
           }}
         />
-      </DashboardBody>
+        <StatTag
+          amount={detailsData.activas}
+          title="Activas"
+          type="Success"
+          filter={() => {
+            setCurrentPage(1);
+            setFilters({ estatus: "En Vigor" });
+            setSearchValue("");
+            setShowAnuladasCheckbox(false);
+          }}
+        />
+        <StatTag
+          amount={detailsData.inactivas}
+          title="Anuladas"
+          type="Danger"
+          filter={() => {
+            setCurrentPage(1);
+            setFilters({ estatus: "Anulada" });
+            setSearchValue("");
+            setAnuladasFilter(false);
+            setShowAnuladasCheckbox(false);
+          }}
+        />
+        <StatTag
+          amount={detailsData.por_vencer}
+          title="Por vencer o fecha superada"
+          type="Warning"
+          filter={() => {
+            setCurrentPage(1);
+            setFilters({ next_due: "true" });
+            setSearchValue("");
+            setAnuladasFilter(false);
+            setShowAnuladasCheckbox(true);
+          }}
+        />
+      </StatContainer>
 
-      <AppliedChangesContainer $visible={polizasChanged.length > 0}>
+      {/* Filters bar */}
+      <FiltersBar $isDark={isDark}>
+        <SearchBar
+          stateValue={filters}
+          stateChangeValue={setFilters}
+          setCurrentPage={setCurrentPage}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+        />
+
+        {showAnuladasCheckbox && (
+          <FilterAnuladas htmlFor="hideCanceled" $isDark={isDark}>
+            <input
+              type="checkbox"
+              id="hideCanceled"
+              checked={showAnuladasFilter}
+              onChange={handleCheckboxChange}
+            />
+            <span />
+            Ocultar anuladas
+          </FilterAnuladas>
+        )}
+
+        <PaginationRow>
+          <PaginationBtn
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            $isDark={isDark}
+            aria-label="Página anterior"
+          >
+            <Icon iconName="KeyboardArrowLeft" customColor={isDark ? "#e2e8f0" : "#374151"} size={18} />
+          </PaginationBtn>
+          <PageIndicator $isDark={isDark}>
+            {currentPage} / {maxPages}
+          </PageIndicator>
+          <PaginationBtn
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, maxPages))
+            }
+            $isDark={isDark}
+            aria-label="Página siguiente"
+          >
+            <Icon iconName="KeyboardArrowRight" customColor={isDark ? "#e2e8f0" : "#374151"} size={18} />
+          </PaginationBtn>
+        </PaginationRow>
+      </FiltersBar>
+
+      {/* Table */}
+      <PolizasContainer
+        data={polizasData}
+        notificationsNotifier={{
+          stateAction: setPolizasChanged,
+          stateValue: polizasChanged,
+        }}
+      />
+
+      {/* Floating changes toast */}
+      <AppliedChangesContainer $visible={polizasChanged.length > 0} $isDark={isDark}>
         <AppliedChangesHeader>
-          <Icon iconName="Warning" customColor="#f9e423" size={24} />
-          <p>
-            Se han aplicado cambios en <span>{polizasChanged.length}</span>
-          </p>
+          <Icon iconName="Warning" customColor="#f9e423" size={20} />
+          <AppliedChangesText $isDark={isDark}>
+            Cambios pendientes en{" "}
+            <strong>{polizasChanged.length}</strong>{" "}
+            {polizasChanged.length === 1 ? "póliza" : "pólizas"}
+          </AppliedChangesText>
         </AppliedChangesHeader>
-
         <Button
           type="DefaultBlue"
           label="Aplicar cambios"
@@ -289,60 +285,98 @@ const Dashboard: React.FC = () => {
   );
 };
 
-const PaginationRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const PageIndicator = styled.span`
-  font-weight: 500;
-`;
+// ---- STYLED COMPONENTS ----
 
 const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px 4vw;
-  gap: 15px;
-  height: calc(100vh - 60px);
+  padding: 28px 4vw 40px;
+  gap: 20px;
+  min-height: calc(100vh - 60px);
   position: relative;
 `;
 
-const AppliedChangesContainer = styled.div<{ $visible: boolean }>`
-  position: absolute;
-  bottom: 25px;
-  right: 25px;
-  ${FlexColumn__SC}
-  ${CardComponent__SC}
-  display:${(p) => (p.$visible ? "flex" : "none")};
-  padding: 20px;
-  gap: 10px;
-`;
-
-const AppliedChangesHeader = styled.div`
-  ${FlexRow__SC}
-  gap:10px;
-`;
-
-const DashboardHeader = styled.div``;
-
-const MoreFiltersSection = styled.div`
+const DashboardHeader = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 `;
 
-// 💡 CORRECCIÓN COMPLETA DE ESTILOS: Asegura centrado perfecto Flexbox y proporciones estables en 28px
-const FilterAnuladas = styled.label`
+const HeaderLeft = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const StatContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+const FiltersBar = styled.div<{ $isDark: boolean }>`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 10px;
+  flex-wrap: wrap;
+  background-color: ${(p) => (p.$isDark ? "var(--bg-dark-header)" : "#ffffff")};
+  border: 1px solid
+    ${(p) =>
+      p.$isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)"};
+  border-radius: 10px;
+  padding: 10px 14px;
+`;
+
+const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+`;
+
+const PaginationBtn = styled.button<{ $isDark: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid
+    ${(p) =>
+      p.$isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
+  background-color: ${(p) =>
+    p.$isDark ? "rgba(255,255,255,0.05)" : "#f8fafc"};
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background-color: ${(p) =>
+      p.$isDark ? "rgba(255,255,255,0.1)" : "#e2e8f0"};
+    border-color: ${(p) =>
+      p.$isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)"};
+  }
+`;
+
+const PageIndicator = styled.span<{ $isDark: boolean }>`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${(p) => (p.$isDark ? "#94a3b8" : "#64748b")};
+  min-width: 52px;
+  text-align: center;
+`;
+
+const FilterAnuladas = styled.label<{ $isDark: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
-  font-size: 14px;
-  font-family: sans-serif;
-  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${(p) => (p.$isDark ? "#94a3b8" : "#475569")};
+  white-space: nowrap;
 
   & > input[type="checkbox"] {
     position: absolute;
@@ -352,67 +386,98 @@ const FilterAnuladas = styled.label`
   }
 
   & > span {
-    display: flex; /* Flexbox para centrar matemáticamente la palomita */
+    display: flex;
     align-items: center;
     justify-content: center;
-
-    width: 28px;
-    height: 28px;
-    border: 2px solid #b3b3b3;
-    border-radius: 6px;
-    background: white;
-    transition: all 0.2s ease-in-out;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid ${(p) => (p.$isDark ? "#475569" : "#cbd5e1")};
+    border-radius: 5px;
+    background: ${(p) => (p.$isDark ? "rgba(255,255,255,0.04)" : "#f8fafc")};
+    transition: all 0.15s ease;
     flex-shrink: 0;
     box-sizing: border-box;
 
     &::after {
       content: "";
-      width: 6px;
-      height: 12px;
+      width: 4px;
+      height: 8px;
       border: solid white;
-      border-width: 0 3px 3px 0; /* Grosor ideal de 3px para balance visual */
+      border-width: 0 2px 2px 0;
       transform: rotate(45deg) translateY(-1px);
       opacity: 0;
-      transition: opacity 0.15s ease-in-out;
+      transition: opacity 0.12s ease;
     }
   }
 
   &:hover > input ~ span {
-    border-color: #4b7bec;
+    border-color: #155dfc;
   }
 
   & > input:checked ~ span {
-    background-color: #4b7bec;
-    border-color: #4b7bec;
+    background-color: #155dfc;
+    border-color: #155dfc;
   }
 
   & > input:checked ~ span::after {
-    opacity: 1; /* Hace visible la palomita */
+    opacity: 1;
   }
 
   & > input:focus-visible ~ span {
-    box-shadow: 0 0 0 3px rgba(75, 123, 236, 0.25);
+    box-shadow: 0 0 0 3px rgba(21, 93, 252, 0.2);
   }
 `;
 
-const DashboardBody = styled.div`
-  display: flex;
+const AppliedChangesContainer = styled.div<{
+  $visible: boolean;
+  $isDark: boolean;
+}>`
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: ${(p) => (p.$visible ? "flex" : "none")};
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  background-color: ${(p) =>
+    p.$isDark ? "var(--bg-dark-header)" : "#ffffff"};
+  border: 1px solid
+    ${(p) =>
+      p.$isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"};
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: ${(p) =>
+    p.$isDark
+      ? "0 8px 32px rgba(0,0,0,0.6)"
+      : "0 8px 32px rgba(0,0,0,0.12)"};
+  min-width: 240px;
+  z-index: 100;
 `;
 
-const StatContainer = styled.div`
+const AppliedChangesHeader = styled.div`
   display: flex;
+  align-items: center;
   gap: 10px;
-  justify-content: center;
+`;
+
+const AppliedChangesText = styled.p<{ $isDark: boolean }>`
+  font-size: 14px;
+  color: ${(p) => (p.$isDark ? "#cbd5e1" : "#374151")};
+
+  strong {
+    color: ${(p) => (p.$isDark ? "#f1f5f9" : "#0f172a")};
+  }
 `;
 
 const DashboardTitle = styled.h1`
   ${textTheme__css}
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.3px;
 `;
 
 const DashboardText = styled.p<{ $theme: PreferedScheme }>`
-  color: ${(p) => (p.$theme === "Dark" ? "#999" : "#000")};
+  font-size: 14px;
+  color: ${(p) => (p.$theme === "Dark" ? "#64748b" : "#64748b")};
 `;
 
 export { DashboardHeader, DashboardTitle, DashboardText, DashboardContainer };
