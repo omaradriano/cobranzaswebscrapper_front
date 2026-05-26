@@ -46,7 +46,6 @@ const CounterCard: React.FC<SpanCardProps> = ({
 
   const alertContext = useContext(AlertContext);
   const auth = useContext(AuthContext);
-
   const dataChanged = useContext(DataChangedContext);
 
   useEffect(() => {
@@ -59,184 +58,263 @@ const CounterCard: React.FC<SpanCardProps> = ({
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
+  const cardType = !includePayment
+    ? "Default"
+    : DefineCounterColor(count, 5);
+
   return (
-    <CounterCardCustom
-      ref={containerRef}
-      $type={!includePayment ? "Default" : DefineCounterColor(count, 5)}
-      onClick={() => {
-        setShowOptions(true);
-      }}
-    >
-      {!includePayment ? (
-        <NoRegisterPaymentLabel>
-          <p style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            {label ?? ""} {label ? ":" : ""}{" "}
-            <span style={{ fontSize: "22px", width: "max-content" }}>
-              {count}
-            </span>
+    <CounterCardWrapper ref={containerRef}>
+      <CounterCardCustom
+        $type={cardType}
+        onClick={() => {
+          if (includePayment) setShowOptions((prev) => !prev);
+        }}
+        $clickable={includePayment}
+      >
+        {!includePayment ? (
+          <NoPaymentRow>
+            <CountBadge $type="Default">
+              {label && <CountLabel>{label}</CountLabel>}
+              <CountNumber $type="Default">{count}</CountNumber>
+            </CountBadge>
             <Icon
               iconName="Warning"
-              size={24}
-              isButton={true}
+              size={18}
+              isButton={false}
               customColor="#fb8d0f"
-            ></Icon>
-          </p>
-          {/* <p>Este registro no tiene pago registrado previo</p> */}
-        </NoRegisterPaymentLabel>
-      ) : (
-        <p>
-          {label ?? ""} {label ? ":" : ""} <span>{count}</span>
-          <Icon iconName="MoreHoriz" size={24} isButton></Icon>
-        </p>
-      )}
+            />
+          </NoPaymentRow>
+        ) : (
+          <PaymentRow>
+            <CountBadge $type={cardType}>
+              {label && <CountLabel>{label}</CountLabel>}
+              <CountNumber $type={cardType}>{count}</CountNumber>
+            </CountBadge>
+            <DaysLabel>días</DaysLabel>
+            <Icon iconName="MoreVert" size={18} isButton={false} />
+          </PaymentRow>
+        )}
+      </CounterCardCustom>
 
-      <CounterCardOptions $isVisible={showOptions}>
-        <CounterCardOption
-          onClick={async () => {
-            const options = {
-              method: "PATCH",
-              body: JSON.stringify({
-                poliza: paymentdata.poliza,
-                paid_period: paymentdata.paid_period,
-              }),
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("session_jwt")}`,
-              },
-            };
+      {showOptions && (
+        <CounterCardOptions>
+          <CounterCardOption
+            onClick={async () => {
+              setShowOptions(false);
+              alertContext?.setAlertOptions({
+                title: "Confirmación de pago",
+                message: `Desea confirmar pago para la poliza ${paymentdata.num_poliza}`,
+                type: "success",
+                onConfirm: async () => {
+                  try {
+                    const options = {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        poliza: paymentdata.poliza,
+                        paid_period: paymentdata.paid_period,
+                      }),
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem("session_jwt")}`,
+                      },
+                    };
 
-            console.log({
-              poliza: paymentdata.poliza,
-              paid_period: paymentdata.paid_period,
-              agente: auth?.session?.agente_uuid,
-            });
-
-            // return
-
-            alertContext?.setAlertOptions({
-              title: "Confirmación de pago",
-              message: `Desea confirmar pago para la poliza ${paymentdata.num_poliza}`,
-              type: "success",
-              onConfirm: async () => {
-                try {
-                  //Aqui se hace la peticion para verificar confirmacion de pago
-                  const response = await fetch(
-                    `${import.meta.env.VITE_API_SERVER_URL}/v1/payments/poliza`,
-                    options,
-                  );
-                  const res = await response.json();
-                  if (res.code !== 202) {
-                    throw new Error(res.message);
+                    const response = await fetch(
+                      `${import.meta.env.VITE_API_SERVER_URL}/v1/payments/poliza`,
+                      options,
+                    );
+                    const res = await response.json();
+                    if (res.code !== 202) {
+                      throw new Error(res.message);
+                    }
+                    dataChanged?.setDataHasChanged((prev) => prev + 1);
+                    alertContext.setAlertOptions({
+                      message: "Se ha completado el pago",
+                      title: "Pago confirmado",
+                      type: "success",
+                      onConfirm: () => {
+                        alertContext.setShowAlert(false);
+                      },
+                    });
+                    alertContext.setShowAlert(true);
+                  } catch (error) {
+                    const errorMessage =
+                      error instanceof Error
+                        ? error.message
+                        : "Error desconocido";
+                    alertContext?.setAlertOptions({
+                      title: "Confirmación de pago",
+                      message: errorMessage,
+                      type: "error",
+                    });
+                    alertContext.setShowAlert(true);
                   }
-                  dataChanged?.setDataHasChanged((prev) => prev + 1);
-                  alertContext.setAlertOptions({
-                    message: "Se ha completado el pago",
-                    title: "Pago confirmado",
-                    type: "success",
-                    onConfirm: () => {
-                      alertContext.setShowAlert(false);
-                    },
-                  });
-                  alertContext.setShowAlert(true);
-                } catch (error) {
-                  //Aqui se define el mensaje de un alert
-                  const errorMessage =
-                    error instanceof Error
-                      ? error.message
-                      : "Error desconocido";
-                  alertContext?.setAlertOptions({
-                    title: "Confirmación de pago",
-                    message: errorMessage,
-                    type: "error",
-                  });
-                  alertContext.setShowAlert(true);
-                }
-              },
-            });
-            alertContext?.setShowAlert(true);
-          }}
-        >
-          Marcar como pagado <Icon iconName="Check" size={24}></Icon>
-        </CounterCardOption>
-      </CounterCardOptions>
-    </CounterCardCustom>
+                },
+              });
+              alertContext?.setShowAlert(true);
+            }}
+          >
+            <Icon iconName="Check" size={16} />
+            <span>Marcar como pagado</span>
+          </CounterCardOption>
+        </CounterCardOptions>
+      )}
+    </CounterCardWrapper>
   );
 };
 
-const CounterCardOption = styled.p`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 10px;
-  border-radius: 8px;
-
-  &:hover {
-    background-color: green;
-  }
-`;
-
-const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
-  display: ${(p) => (p.$isVisible ? "flex" : "none")};
-  position: absolute;
-  right: 105%;
-  top: -4px;
-  /* transform: translate(50%, 0); */
-  ${CardComponent__SC}
-  padding: 5px 5px;
-  height: fit-content;
-  width: max-content;
-
-  & > span:hover {
-    background-color: white;
-  }
-`;
-
-const CounterCardCustom = styled.div<{ $type: CardType }>`
-  display: none;
+/* ─── Wrapper ──────────────────────────────────────────────────── */
+const CounterCardWrapper = styled.div`
   position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+/* ─── Main card ────────────────────────────────────────────────── */
+const CounterCardCustom = styled.div<{ $type: CardType; $clickable: boolean }>`
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
-  height: fit-content;
-  justify-content: center;
-  border-radius: 6px;
-  padding: 5px 10px;
-  width: fit-content;
-  min-width: 75px;
-  ${ButtonConf__SC}
-  opacity: 0.8;
-  cursor: pointer;
-
+  gap: 8px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: ${(p) => (p.$clickable ? "pointer" : "default")};
   ${textTheme__css}
+  background-color: ${(p) =>
+    p.$type === "Success"
+      ? "rgba(34,197,94,0.12)"
+      : p.$type === "Warning"
+        ? "rgba(251,141,15,0.12)"
+        : p.$type === "Danger"
+          ? "rgba(239,68,68,0.12)"
+          : p.theme.mode === "Dark"
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(0,0,0,0.04)"};
+  border: 1px solid
+    ${(p) =>
+      p.$type === "Success"
+        ? "rgba(34,197,94,0.3)"
+        : p.$type === "Warning"
+          ? "rgba(251,141,15,0.3)"
+          : p.$type === "Danger"
+            ? "rgba(239,68,68,0.3)"
+            : p.theme.mode === "Dark"
+              ? "rgba(255,255,255,0.1)"
+              : "rgba(0,0,0,0.1)"};
+  transition: opacity 0.15s;
 
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  &:hover {
+    opacity: ${(p) => (p.$clickable ? "0.85" : "1")};
+  }
+`;
 
-  & > p {
-    display: flex;
-    align-items: center;
-    font-size: clamp(14px, 1.5vw, 1rem);
-    height: 24px;
-    gap: 5px;
+/* ─── Row layouts ──────────────────────────────────────────────── */
+const PaymentRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
 
-    & > span {
-      font-size: 22px;
+const NoPaymentRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+/* ─── Count badge ──────────────────────────────────────────────── */
+const CountBadge = styled.div<{ $type: CardType }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+`;
+
+const CountLabel = styled.span`
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a8a8a;
+  line-height: 1;
+`;
+
+const CountNumber = styled.span<{ $type: CardType }>`
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: ${(p) =>
+    p.$type === "Success"
+      ? "#16a34a"
+      : p.$type === "Warning"
+        ? "#d97706"
+        : p.$type === "Danger"
+          ? "#dc2626"
+          : p.theme.mode === "Dark"
+            ? "#fff"
+            : "#111"};
+`;
+
+const DaysLabel = styled.span`
+  font-size: 11px;
+  font-weight: 500;
+  color: #8a8a8a;
+  align-self: flex-end;
+  margin-bottom: 4px;
+`;
+
+/* ─── Options dropdown ─────────────────────────────────────────── */
+const CounterCardOptions = styled.div`
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  ${CardComponent__SC}
+  padding: 6px;
+  min-width: 190px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  animation: fadeIn 0.12s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 `;
 
-const NoRegisterPaymentLabel = styled.div`
+const CounterCardOption = styled.button`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   ${textTheme__css}
-  font-size: clamp(14px, 1.5vw, 1rem);
-  color: #000000b0;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover {
+    background-color: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+  }
 `;
 
 export default CounterCard;
