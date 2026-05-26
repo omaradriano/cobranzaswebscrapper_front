@@ -31,8 +31,8 @@ const Modal: React.FC<ModalProps> = ({
   setModalOpen,
   polizaData,
 }) => {
-  const principal = polizaData.asegurados.filter((a) => a.is_principal)[0];
-  const dependientes = polizaData.asegurados.filter((a) => !a.is_principal);
+  const principal = polizaData?.asegurados?.filter((a) => a.is_principal)[0];
+  const dependientes = polizaData?.asegurados?.filter((a) => !a.is_principal);
 
   return (
     <>

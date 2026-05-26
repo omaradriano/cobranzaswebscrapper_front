@@ -574,7 +574,7 @@ const Home: React.FC = () => {
           pagos pendientes sin tener que preocuparte de comenzar de cero.
         </HeroSubtitle>
         <HeroCTAGroup>
-          <PrimaryButton to="/auth/register">Comenzar gratis</PrimaryButton>
+          <PrimaryButton to="/auth/register">Registrate gratis</PrimaryButton>
           <SecondaryButton to="/auth/signin">Iniciar sesión</SecondaryButton>
         </HeroCTAGroup>
         <HeroVisual>

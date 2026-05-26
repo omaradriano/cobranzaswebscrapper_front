@@ -15,9 +15,6 @@ import Alert from "./modalAlert";
 import SearchBar from "./searchbar";
 
 import {
-  CardComponent__SC,
-  FlexColumn__SC,
-  FlexRow__SC,
   textTheme__css,
 } from "../styles/CssComponents";
 

@@ -50,7 +50,8 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
       const isPublicRoute =
         location.pathname === "/home" ||
         location.pathname === "/auth/signin" ||
-        location.pathname === "/privacy";
+        location.pathname === "/privacy" ||
+        location.pathname === '/auth/register';
 
       if (!session_token) {
         setIsAuthenticated(false);
