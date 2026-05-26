@@ -91,7 +91,9 @@ const PrimaryButton = styled(NavLink)`
   text-decoration: none;
   transition: opacity 0.2s;
 
-  &:hover { opacity: 0.82; }
+  &:hover {
+    opacity: 0.82;
+  }
 
   &::after {
     content: "→";
@@ -109,7 +111,9 @@ const SecondaryButton = styled(NavLink)`
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 
   &:hover {
     background: #1a1a1a;
@@ -141,6 +145,7 @@ const PlaceholderLabel = styled.span`
 `;
 
 // ── STATS BAR ────────────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StatsBar = styled.section`
   display: flex;
   justify-content: center;
@@ -151,6 +156,7 @@ const StatsBar = styled.section`
   margin: 4rem 0;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StatItem = styled.div`
   flex: 1;
   min-width: 160px;
@@ -158,15 +164,20 @@ const StatItem = styled.div`
   text-align: center;
   border-right: 1px solid #d4ccc4;
 
-  &:last-child { border-right: none; }
+  &:last-child {
+    border-right: none;
+  }
 
   @media (max-width: 600px) {
     border-right: none;
     border-bottom: 1px solid #d4ccc4;
-    &:last-child { border-bottom: none; }
+    &:last-child {
+      border-bottom: none;
+    }
   }
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StatNumber = styled.p`
   font-size: clamp(1.8rem, 3.5vw, 2.8rem);
   font-weight: 800;
@@ -175,6 +186,7 @@ const StatNumber = styled.p`
   margin-bottom: 0.35rem;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StatLabel = styled.p`
   font-size: 0.78rem;
   letter-spacing: 0.08em;
@@ -219,8 +231,12 @@ const SectionLink = styled(NavLink)`
   transition: opacity 0.2s;
   white-space: nowrap;
 
-  &:hover { opacity: 1; }
-  &::after { content: "→"; }
+  &:hover {
+    opacity: 1;
+  }
+  &::after {
+    content: "→";
+  }
 `;
 
 const FeaturesGrid = styled.div`
@@ -244,11 +260,13 @@ const FeatureCard = styled.div<{ $accent?: string }>`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
   }
 `;
 
@@ -346,6 +364,7 @@ const QuoteSection = styled.section`
   text-align: center;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const QuoteText = styled.blockquote`
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   font-weight: 700;
@@ -356,6 +375,7 @@ const QuoteText = styled.blockquote`
   text-wrap: balance;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const QuoteAuthor = styled.div`
   display: flex;
   align-items: center;
@@ -363,6 +383,7 @@ const QuoteAuthor = styled.div`
   gap: 0.75rem;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Avatar = styled.div`
   width: 40px;
   height: 40px;
@@ -370,16 +391,19 @@ const Avatar = styled.div`
   background: #d4ccc4;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AuthorInfo = styled.div`
   text-align: left;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AuthorName = styled.p`
   font-size: 0.875rem;
   font-weight: 700;
   color: #1a1a1a;
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AuthorRole = styled.p`
   font-size: 0.78rem;
   color: #888;
@@ -431,8 +455,12 @@ const CTAButton = styled(NavLink)`
   text-decoration: none;
   transition: opacity 0.2s;
 
-  &:hover { opacity: 0.85; }
-  &::after { content: "→"; }
+  &:hover {
+    opacity: 0.85;
+  }
+  &::after {
+    content: "→";
+  }
 `;
 
 // ── FOOTER ────────────────────────────────────────────────────────────────────
@@ -464,7 +492,9 @@ const FooterLink = styled(NavLink)`
   color: #888;
   text-decoration: none;
   transition: color 0.2s;
-  &:hover { color: #1a1a1a; }
+  &:hover {
+    color: #1a1a1a;
+  }
 `;
 
 const FooterCopy = styled.p`
@@ -478,57 +508,57 @@ const features = [
   {
     icon: "📋",
     bg: "#d4e9da",
-    name: "Funcionalidad A",
-    desc: "Breve descripción de la primera funcionalidad principal de tu plataforma.",
+    name: "Captura de polizas",
+    desc: "Migra todos tus datos en minutos a nuestra plataforma gracias a nuestra extensión de navegador",
   },
   {
     icon: "⚡",
     bg: "#fde9c8",
-    name: "Funcionalidad B",
-    desc: "Breve descripción de la segunda funcionalidad principal de tu plataforma.",
+    name: "Cálculo automático de tus siguientes pagos",
+    desc: "Gracias a nuestra lógica interna tienes la capacidad de re calcular el siguiente pago de manera automática",
   },
   {
     icon: "🔒",
     bg: "#ddd5c8",
-    name: "Funcionalidad C",
-    desc: "Breve descripción de la tercera funcionalidad principal de tu plataforma.",
+    name: "Calendario de cumpleaños",
+    desc: "Un calendario diseñados para festejar a tus clientes",
   },
-  {
-    icon: "📊",
-    bg: "#d4e9da",
-    name: "Funcionalidad D",
-    desc: "Breve descripción de la cuarta funcionalidad principal de tu plataforma.",
-  },
-  {
-    icon: "🔔",
-    bg: "#fde9c8",
-    name: "Funcionalidad E",
-    desc: "Breve descripción de la quinta funcionalidad principal de tu plataforma.",
-  },
-  {
-    icon: "🤝",
-    bg: "#ddd5c8",
-    name: "Funcionalidad F",
-    desc: "Breve descripción de la sexta funcionalidad principal de tu plataforma.",
-  },
+  // {
+  //   icon: "📊",
+  //   bg: "#d4e9da",
+  //   name: "Funcionalidad D",
+  //   desc: "Breve descripción de la cuarta funcionalidad principal de tu plataforma.",
+  // },
+  // {
+  //   icon: "🔔",
+  //   bg: "#fde9c8",
+  //   name: "Funcionalidad E",
+  //   desc: "Breve descripción de la quinta funcionalidad principal de tu plataforma.",
+  // },
+  // {
+  //   icon: "🤝",
+  //   bg: "#ddd5c8",
+  //   name: "Funcionalidad F",
+  //   desc: "Breve descripción de la sexta funcionalidad principal de tu plataforma.",
+  // },
 ];
 
 const steps = [
   {
     num: "Paso 01",
-    title: "Primer paso",
-    desc: "Descripción de la primera acción que realiza el usuario para comenzar.",
+    title: "Uso de la extensión",
+    desc: "Usa nuestra extensión GoAgent para migrar tus datos de la plataforma original.",
   },
   {
     num: "Paso 02",
-    title: "Segundo paso",
-    desc: "Descripción de la segunda acción clave dentro del flujo principal.",
+    title: "Comienza a usar tu plataforma",
+    desc: "Y listo!, ya puedes verificar el estado de tus polizas :)",
   },
-  {
-    num: "Paso 03",
-    title: "Tercer paso",
-    desc: "Descripción del resultado o acción final que completa el proceso.",
-  },
+  // {
+  //   num: "Paso 03",
+  //   title: "Tercer paso",
+  //   desc: "Descripción del resultado o acción final que completa el proceso.",
+  // },
 ];
 
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
@@ -538,22 +568,24 @@ const Home: React.FC = () => {
       {/* HERO */}
       <HeroSection>
         <Eyebrow>Nuevo · Plataforma disponible</Eyebrow>
-        <HeroTitle>El título principal de tu producto va aquí</HeroTitle>
+        <HeroTitle>Nada como GoAgent</HeroTitle>
         <HeroSubtitle>
-          Descripción breve y clara de lo que ofrece tu plataforma. Explica el
-          valor principal en una o dos oraciones.
+          Con nuestra plataforma puedes llevar un control de todas tus polizas y
+          pagos pendientes sin tener que preocuparte de comenzar de cero.
         </HeroSubtitle>
         <HeroCTAGroup>
           <PrimaryButton to="/auth/register">Comenzar gratis</PrimaryButton>
           <SecondaryButton to="/auth/signin">Iniciar sesión</SecondaryButton>
         </HeroCTAGroup>
         <HeroVisual>
-          <PlaceholderLabel>Captura de pantalla / imagen del producto</PlaceholderLabel>
+          <PlaceholderLabel>
+            Captura de pantalla / imagen del producto
+          </PlaceholderLabel>
         </HeroVisual>
       </HeroSection>
 
       {/* STATS */}
-      <StatsBar>
+      {/* <StatsBar>
         <StatItem>
           <StatNumber>+1.000</StatNumber>
           <StatLabel>Métrica clave A</StatLabel>
@@ -570,7 +602,7 @@ const Home: React.FC = () => {
           <StatNumber>+500</StatNumber>
           <StatLabel>Métrica clave D</StatLabel>
         </StatItem>
-      </StatsBar>
+      </StatsBar> */}
 
       {/* FEATURES */}
       <FeaturesSection>
@@ -608,7 +640,7 @@ const Home: React.FC = () => {
 
       {/* TESTIMONIAL */}
       <QuoteSection>
-        <QuoteText>
+        {/* <QuoteText>
           &ldquo;Esta plataforma transformó completamente la manera en que gestionamos
           nuestro trabajo. Resultados increíbles desde el primer día.&rdquo;
         </QuoteText>
@@ -618,15 +650,15 @@ const Home: React.FC = () => {
             <AuthorName>Nombre del cliente</AuthorName>
             <AuthorRole>Cargo · Empresa</AuthorRole>
           </AuthorInfo>
-        </QuoteAuthor>
+        </QuoteAuthor> */}
       </QuoteSection>
 
       {/* CTA BANNER */}
       <CTASection>
         <CTATitle>¿Listo para empezar?</CTATitle>
         <CTASubtitle>
-          Únete hoy y descubre todo lo que la plataforma tiene para ofrecer.
-          Sin tarjeta de crédito requerida.
+          Únete hoy y descubre todo lo que la plataforma tiene para ofrecer. Sin
+          tarjeta de crédito requerida.
         </CTASubtitle>
         <CTAButton to="/auth/register">Crear cuenta gratuita</CTAButton>
       </CTASection>
@@ -639,7 +671,9 @@ const Home: React.FC = () => {
           <FooterLink to="/auth/signin">Iniciar sesión</FooterLink>
           <FooterLink to="/auth/register">Registro</FooterLink>
         </FooterLinks>
-        <FooterCopy>© 2026 Tu Empresa. Todos los derechos reservados.</FooterCopy>
+        <FooterCopy>
+          © 2026 Tu Empresa. Todos los derechos reservados.
+        </FooterCopy>
       </Footer>
     </PageWrapper>
   );
