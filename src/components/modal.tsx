@@ -51,14 +51,14 @@ const Modal: React.FC<ModalProps> = ({
     estatus: polizaData.estatus,
   });
 
-  // Reset editable fields when polizaData changes (new modal opened)
+  // Reset editable fields when modal closes or polizaData changes
   useEffect(() => {
     setEditFields({
       forma_pago: polizaData.forma_pago as FormaPago,
       diaCobro: polizaData.diaCobro,
       estatus: polizaData.estatus,
     });
-  }, [polizaData]);
+  }, [polizaData, modalOpen]);
 
   const hasChanges =
     editFields.forma_pago !== polizaData.forma_pago ||
