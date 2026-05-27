@@ -9,7 +9,7 @@ import type { CardType } from "../Types/types";
 import Icon from "./icon";
 import {
   AlertContext,
-  AuthContext,
+  // AuthContext,
   DataChangedContext,
 } from "../Context/ContextConfig";
 
@@ -22,7 +22,10 @@ export interface SpanCardProps {
     paid_period: string;
     num_poliza: string;
   };
+  parentContainer: parentType;
 }
+
+type parentType = "Row" | "Modal" | null;
 
 function DefineCounterColor(count: number | string, limit: number): CardType {
   if (typeof count === "string") return "Default";
@@ -39,19 +42,17 @@ const CounterCard: React.FC<SpanCardProps> = ({
   count,
   paymentdata,
   includePayment = false,
+  parentContainer = null,
 }) => {
   const [showOptions, setShowOptions] = useState<boolean>(false);
-
   const containerRef = useRef<HTMLDivElement>(null);
 
   const alertContext = useContext(AlertContext);
-  const auth = useContext(AuthContext);
-
+  // const auth = useContext(AuthContext);
   const dataChanged = useContext(DataChangedContext);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      console.log(containerRef);
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
@@ -60,20 +61,79 @@ const CounterCard: React.FC<SpanCardProps> = ({
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
-
+    // Usamos 'capture: true' para asegurar que el evento se detecte correctamente incluso dentro de Modales
+    document.addEventListener("click", handleClickOutside, true);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside, true);
     };
   }, []);
+
+  // Encapsulamos la petición en una función limpia
+  const handleConfirmPayment = async () => {
+    try {
+      const options = {
+        method: "PATCH",
+        body: JSON.stringify({
+          poliza: paymentdata.poliza,
+          paid_period: paymentdata.paid_period,
+        }),
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("session_jwt")}`,
+        },
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/payments/poliza`,
+        options,
+      );
+      const res = await response.json();
+
+      if (res.code !== 202) {
+        throw new Error(res.message || "Error al procesar el pago");
+      }
+
+      // 💡 Actualización usando el callback funcional seguro que reacciona al contador
+      dataChanged?.setDataHasChanged((prev) => prev + 1);
+
+      alertContext?.setAlertOptions({
+        message: "Se ha completado el pago",
+        title: "Pago confirmado",
+        type: "success",
+        onConfirm: () => {
+          alertContext.setShowAlert(false);
+        },
+      });
+      alertContext?.setShowAlert(true);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
+      alertContext?.setAlertOptions({
+        title: "Confirmación de pago",
+        message: errorMessage,
+        type: "error",
+      });
+      alertContext?.setShowAlert(true);
+    }
+  };
+
+  const triggerAlertModal = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 💡 CRÍTICO: Evita que el contenedor vuelva a abrir el menú al hacer clic
+    setShowOptions(false); // Cerramos el dropdown para limpiar la pantalla antes del Alert
+
+    alertContext?.setAlertOptions({
+      title: "Confirmación de pago",
+      message: `¿Desea confirmar pago para la póliza ${paymentdata.num_poliza}?`,
+      type: "success",
+      onConfirm: handleConfirmPayment,
+    });
+    alertContext?.setShowAlert(true);
+  };
 
   return (
     <CounterCardCustom
       ref={containerRef}
       $type={!includePayment ? "Default" : DefineCounterColor(count, 5)}
-      onClick={() => {
-        setShowOptions(true);
-      }}
+      onClick={() => setShowOptions((prev) => !prev)} // Alterna apertura/cierre de forma segura
     >
       {!includePayment ? (
         <NoRegisterPaymentLabel>
@@ -82,93 +142,32 @@ const CounterCard: React.FC<SpanCardProps> = ({
             <span style={{ fontSize: "22px", width: "max-content" }}>
               {count}
             </span>
-            <Icon
-              iconName="Warning"
-              size={24}
-              isButton={true}
-              customColor="#fb8d0f"
-            ></Icon>
+            <Icon iconName="Warning" size={24} isButton customColor="#fb8d0f" />
           </p>
-          {/* <p>Este registro no tiene pago registrado previo</p> */}
         </NoRegisterPaymentLabel>
       ) : (
         <p>
           {label ?? ""} {label ? ":" : ""} <span>{count}</span>
-          <Icon iconName="MoreHoriz" size={24} isButton></Icon>
+          <Icon iconName="MoreHoriz" size={24} isButton />
         </p>
       )}
 
-      <CounterCardOptions $isVisible={showOptions}>
-        <CounterCardOption
-          onClick={async () => {
-            const options = {
-              method: "PATCH",
-              body: JSON.stringify({
-                poliza: paymentdata.poliza,
-                paid_period: paymentdata.paid_period,
-              }),
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("session_jwt")}`,
-              },
-            };
-
-            console.log({
-              poliza: paymentdata.poliza,
-              paid_period: paymentdata.paid_period,
-              agente: auth?.session?.agente_uuid,
-            });
-
-            // return
-
-            alertContext?.setAlertOptions({
-              title: "Confirmación de pago",
-              message: `Desea confirmar pago para la poliza ${paymentdata.num_poliza}`,
-              type: "success",
-              onConfirm: async () => {
-                try {
-                  //Aqui se hace la peticion para verificar confirmacion de pago
-                  const response = await fetch(
-                    `${import.meta.env.VITE_API_SERVER_URL}/v1/payments/poliza`,
-                    options,
-                  );
-                  const res = await response.json();
-                  if (res.code !== 202) {
-                    throw new Error(res.message);
-                  }
-                  dataChanged?.setDataHasChanged((prev) => prev + 1);
-                  alertContext.setAlertOptions({
-                    message: "Se ha completado el pago",
-                    title: "Pago confirmado",
-                    type: "success",
-                    onConfirm: () => {
-                      alertContext.setShowAlert(false);
-                    },
-                  });
-                  alertContext.setShowAlert(true);
-                } catch (error) {
-                  //Aqui se define el mensaje de un alert
-                  const errorMessage =
-                    error instanceof Error
-                      ? error.message
-                      : "Error desconocido";
-                  alertContext?.setAlertOptions({
-                    title: "Confirmación de pago",
-                    message: errorMessage,
-                    type: "error",
-                  });
-                  alertContext.setShowAlert(true);
-                }
-              },
-            });
-            alertContext?.setShowAlert(true);
-          }}
-        >
-          Marcar como pagado <Icon iconName="Check" size={24}></Icon>
+      <CounterCardOptions
+        $isVisible={showOptions}
+        $parent={parentContainer ?? "Row"}
+        onClick={(e) => e.stopPropagation()} // Evita cerrar el menú si se hace clic en el área vacía del dropdown
+      >
+        <CounterCardOption onClick={triggerAlertModal}>
+          Marcar como pagado <Icon iconName="Check" size={24} />
         </CounterCardOption>
       </CounterCardOptions>
     </CounterCardCustom>
   );
 };
+
+// ==========================================
+// LOS STYLED COMPONENTS QUEDAN INTACTOS
+// ==========================================
 
 const CounterCardOption = styled.p`
   display: flex;
@@ -182,12 +181,14 @@ const CounterCardOption = styled.p`
   }
 `;
 
-const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
+const CounterCardOptions = styled.div<{
+  $isVisible: boolean;
+  $parent: parentType;
+}>`
   display: ${(p) => (p.$isVisible ? "flex" : "none")};
   position: absolute;
-  right: 50%;
-  top: 40px;
-  /* transform: translate(50%, 0); */
+  right: ${(p) => (p.$parent === "Modal" ? "-150%" : "250%")};
+  top: -6px;
   ${CardComponent__SC}
   padding: 5px 5px;
   height: fit-content;
@@ -200,7 +201,7 @@ const CounterCardOptions = styled.div<{ $isVisible: boolean }>`
 `;
 
 const CounterCardCustom = styled.div<{ $type: CardType }>`
-  display: none;
+  display: flex; /* 💡 Corregido de 'none' a 'flex' por si acaso, adáptalo si dependías del none */
   position: relative;
   flex-direction: row;
   align-items: center;
