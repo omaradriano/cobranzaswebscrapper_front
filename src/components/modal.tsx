@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import styled, { css } from "styled-components";
 import Icon from "./icon";
 import {
@@ -16,12 +16,14 @@ import {
   calculateDaysUntilLimit,
   formatDate,
 } from "../functions/globalFunctions";
+import { AuthContext } from "../Context/ContextConfig";
+import { useNavigate } from "react-router";
 
 type FormaPago = "MENSUAL" | "TRIMESTRAL" | "SEMESTRAL" | "ANUAL";
 
 interface EditableFields {
   forma_pago: FormaPago;
-  diaCobro: number;
+  dia_cobro: string;
   estatus: StatusValues;
 }
 
@@ -34,7 +36,12 @@ export interface ModalProps {
   polizaData: PolizaGetItem;
 }
 
-const FORMAS_PAGO: FormaPago[] = ["MENSUAL", "TRIMESTRAL", "SEMESTRAL", "ANUAL"];
+const FORMAS_PAGO: FormaPago[] = [
+  "MENSUAL",
+  "TRIMESTRAL",
+  "SEMESTRAL",
+  "ANUAL",
+];
 
 const Modal: React.FC<ModalProps> = ({
   title = "Detalle de Póliza",
@@ -45,24 +52,27 @@ const Modal: React.FC<ModalProps> = ({
   const principal = polizaData?.asegurados?.filter((a) => a.is_principal)[0];
   const dependientes = polizaData?.asegurados?.filter((a) => !a.is_principal);
 
-  const [editFields, setEditFields] = useState<EditableFields>({
+  const getInitialFields = () => ({
     forma_pago: (polizaData.forma_pago ?? "MENSUAL") as FormaPago,
-    diaCobro: polizaData.diaCobro ?? 0,
+    dia_cobro: polizaData.diaCobro ?? "",
     estatus: polizaData.estatus ?? "En Vigor",
+    numpoliza: polizaData.num_poliza
   });
 
-  // Reset editable fields when modal closes or polizaData changes
+  // Use a key to force remount and reset state when polizaData or modalOpen changes
+  const [editFields, setEditFields] =
+    useState<EditableFields>(getInitialFields());
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    setEditFields({
-      forma_pago: (polizaData.forma_pago ?? "MENSUAL") as FormaPago,
-      diaCobro: polizaData.diaCobro ?? 0,
-      estatus: polizaData.estatus ?? "En Vigor",
-    });
+    setEditFields(getInitialFields());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [polizaData, modalOpen]);
 
   const hasChanges =
     editFields.forma_pago !== polizaData.forma_pago ||
-    editFields.diaCobro !== polizaData.diaCobro ||
+    editFields.dia_cobro !== polizaData.dia_cobro ||
     editFields.estatus !== polizaData.estatus;
 
   const handleDiaCobroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,13 +95,33 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   const handleGuardar = async () => {
-    // TODO: configurar fetch al servidor
-    // Ejemplo:
-    // await fetch(`/api/polizas/${polizaData.poliza_uuid}`, {
-    //   method: "PATCH",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(editFields),
-    // });
+    const session_token = localStorage.getItem("session_jwt");
+    if (!session_token) {
+      auth?.setIsAuthenticated(false);
+      navigate("/home");
+      return null;
+    }
+    console.log("Aqui se envian los datos actualizados");
+    try {
+      console.log(JSON.stringify(editFields));
+      const response = await fetch(
+        `${import.meta.env.VITE_API_SERVER_URL}/v1/scrapping/poliza`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session_token}`,
+          },
+          body: JSON.stringify({...editFields}),
+        },
+      );
+
+      const response_json = await response.json();
+      console.log(response_json);
+      
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -150,7 +180,9 @@ const Modal: React.FC<ModalProps> = ({
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
-                        value={String(editFields.diaCobro === 0 ? "" : editFields.diaCobro)}
+                        value={String(
+                          editFields.dia_cobro === 0 ? "" : editFields.dia_cobro,
+                        )}
                         placeholder="0"
                         onChange={handleDiaCobroChange}
                         onBlur={handleDiaCobroBlur}
@@ -181,7 +213,9 @@ const Modal: React.FC<ModalProps> = ({
                         onClick={toggleEstatus}
                         type="button"
                       >
-                        <EstatusIndicator $active={editFields.estatus === "En Vigor"} />
+                        <EstatusIndicator
+                          $active={editFields.estatus === "En Vigor"}
+                        />
                         <span>{editFields.estatus}</span>
                       </EstatusToggle>
                     </MetaItem>
@@ -621,19 +655,17 @@ const EstatusToggle = styled.button<{ $active: boolean }>`
   padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid
-    ${(p) =>
-      p.$active
-        ? "rgba(34, 197, 94, 0.4)"
-        : "rgba(239, 68, 68, 0.4)"};
+    ${(p) => (p.$active ? "rgba(34, 197, 94, 0.4)" : "rgba(239, 68, 68, 0.4)")};
   background-color: ${(p) =>
-    p.$active
-      ? "rgba(34, 197, 94, 0.10)"
-      : "rgba(239, 68, 68, 0.10)"};
+    p.$active ? "rgba(34, 197, 94, 0.10)" : "rgba(239, 68, 68, 0.10)"};
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  color: ${(p) => (p.$active ? "var(--sc-success-color)" : "var(--sc-danger-color)")};
-  transition: background-color 0.15s, border-color 0.15s;
+  color: ${(p) =>
+    p.$active ? "var(--sc-success-color)" : "var(--sc-danger-color)"};
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
   width: 100%;
 `;
 
