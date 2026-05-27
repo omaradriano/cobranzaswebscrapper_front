@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
-import styled from "styled-components";
+import { useState, useEffect } from "react";
+import styled, { css } from "styled-components";
 import Icon from "./icon";
 import {
   CardTextTheme__CSS,
@@ -16,6 +17,14 @@ import {
   formatDate,
 } from "../functions/globalFunctions";
 
+type FormaPago = "MENSUAL" | "TRIMESTRAL" | "SEMESTRAL" | "ANUAL";
+
+interface EditableFields {
+  forma_pago: FormaPago;
+  diaCobro: number;
+  estatus: StatusValues;
+}
+
 export interface ModalProps {
   onClose?: () => void;
   children?: React.ReactNode;
@@ -25,6 +34,8 @@ export interface ModalProps {
   polizaData: PolizaGetItem;
 }
 
+const FORMAS_PAGO: FormaPago[] = ["MENSUAL", "TRIMESTRAL", "SEMESTRAL", "ANUAL"];
+
 const Modal: React.FC<ModalProps> = ({
   title = "Detalle de Póliza",
   modalOpen = false,
@@ -33,6 +44,55 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const principal = polizaData?.asegurados?.filter((a) => a.is_principal)[0];
   const dependientes = polizaData?.asegurados?.filter((a) => !a.is_principal);
+
+  const [editFields, setEditFields] = useState<EditableFields>({
+    forma_pago: polizaData.forma_pago as FormaPago,
+    diaCobro: polizaData.diaCobro,
+    estatus: polizaData.estatus,
+  });
+
+  // Reset editable fields when polizaData changes (new modal opened)
+  useEffect(() => {
+    setEditFields({
+      forma_pago: polizaData.forma_pago as FormaPago,
+      diaCobro: polizaData.diaCobro,
+      estatus: polizaData.estatus,
+    });
+  }, [polizaData]);
+
+  const hasChanges =
+    editFields.forma_pago !== polizaData.forma_pago ||
+    editFields.diaCobro !== polizaData.diaCobro ||
+    editFields.estatus !== polizaData.estatus;
+
+  const handleDiaCobroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    const num = raw === "" ? 0 : parseInt(raw, 10);
+    setEditFields((prev) => ({ ...prev, diaCobro: num }));
+  };
+
+  const handleDiaCobroBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value === "" || isNaN(Number(e.target.value))) {
+      setEditFields((prev) => ({ ...prev, diaCobro: 0 }));
+    }
+  };
+
+  const toggleEstatus = () => {
+    setEditFields((prev) => ({
+      ...prev,
+      estatus: prev.estatus === "En Vigor" ? "Anulada" : "En Vigor",
+    }));
+  };
+
+  const handleGuardar = async () => {
+    // TODO: configurar fetch al servidor
+    // Ejemplo:
+    // await fetch(`/api/polizas/${polizaData.poliza_uuid}`, {
+    //   method: "PATCH",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(editFields),
+    // });
+  };
 
   return (
     <>
@@ -52,8 +112,8 @@ const Modal: React.FC<ModalProps> = ({
                   </div>
                 </HeaderLeft>
                 <HeaderRight>
-                  <StatusBadge $type={polizaData.estatus}>
-                    {polizaData.estatus}
+                  <StatusBadge $type={editFields.estatus}>
+                    {editFields.estatus}
                   </StatusBadge>
                   <CloseBtn onClick={() => setModalOpen(false)}>
                     <Icon iconName="Clear" size={18} isButton={false} />
@@ -86,15 +146,44 @@ const Modal: React.FC<ModalProps> = ({
                     </MetaItem>
                     <MetaItem>
                       <MetaLabel>Día de cobro</MetaLabel>
-                      <MetaValue>{polizaData.diaCobro}</MetaValue>
+                      <EditInput
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        value={editFields.diaCobro === 0 ? "" : editFields.diaCobro}
+                        placeholder="0"
+                        onChange={handleDiaCobroChange}
+                        onBlur={handleDiaCobroBlur}
+                      />
                     </MetaItem>
                     <MetaItem>
                       <MetaLabel>Forma de pago</MetaLabel>
-                      <MetaValue>{polizaData.forma_pago}</MetaValue>
+                      <EditSelect
+                        value={editFields.forma_pago}
+                        onChange={(e) =>
+                          setEditFields((prev) => ({
+                            ...prev,
+                            forma_pago: e.target.value as FormaPago,
+                          }))
+                        }
+                      >
+                        {FORMAS_PAGO.map((fp) => (
+                          <option key={fp} value={fp}>
+                            {fp}
+                          </option>
+                        ))}
+                      </EditSelect>
                     </MetaItem>
                     <MetaItem>
-                      <MetaLabel>Medio de cobro</MetaLabel>
-                      <MetaValue>{polizaData.medio_cobro}</MetaValue>
+                      <MetaLabel>Estatus</MetaLabel>
+                      <EstatusToggle
+                        $active={editFields.estatus === "En Vigor"}
+                        onClick={toggleEstatus}
+                        type="button"
+                      >
+                        <EstatusIndicator $active={editFields.estatus === "En Vigor"} />
+                        <span>{editFields.estatus}</span>
+                      </EstatusToggle>
                     </MetaItem>
                   </SectionMeta>
                 </CounterSection>
@@ -185,6 +274,14 @@ const Modal: React.FC<ModalProps> = ({
 
               {/* FOOTER */}
               <ModalFooter>
+                {hasChanges && (
+                  <Button
+                    action={handleGuardar}
+                    label="Guardar cambios"
+                    type="DefaultBlue"
+                    iconName="Save"
+                  />
+                )}
                 <Button action={() => setModalOpen(false)} label="Cerrar" />
               </ModalFooter>
             </ModalContent>
@@ -478,6 +575,77 @@ const DependienteItem = styled.div`
   opacity: 0.8;
 `;
 
+/* ─── Editable fields ─────────────────────────────────────────── */
+const editableBase = css`
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid
+    ${(p) =>
+      p.theme.mode === "Dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"};
+  background-color: ${(p) =>
+    p.theme.mode === "Dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"};
+  ${textTheme__css}
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: #155dfc;
+  }
+`;
+
+const EditInput = styled.input`
+  ${editableBase}
+  /* Hide number spin buttons */
+  -moz-appearance: textfield;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
+const EditSelect = styled.select`
+  ${editableBase}
+  cursor: pointer;
+  appearance: auto;
+`;
+
+const EstatusToggle = styled.button<{ $active: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid
+    ${(p) =>
+      p.$active
+        ? "rgba(34, 197, 94, 0.4)"
+        : "rgba(239, 68, 68, 0.4)"};
+  background-color: ${(p) =>
+    p.$active
+      ? "rgba(34, 197, 94, 0.10)"
+      : "rgba(239, 68, 68, 0.10)"};
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: ${(p) => (p.$active ? "var(--sc-success-color)" : "var(--sc-danger-color)")};
+  transition: background-color 0.15s, border-color 0.15s;
+  width: 100%;
+`;
+
+const EstatusIndicator = styled.span<{ $active: boolean }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: ${(p) =>
+    p.$active ? "var(--sc-success-color)" : "var(--sc-danger-color)"};
+`;
+
 /* ─── Footer ──────────────────────────────────────────────────── */
 const ModalFooter = styled.div`
   border-top: 1px solid
@@ -488,6 +656,7 @@ const ModalFooter = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
+  gap: 10px;
   flex-shrink: 0;
 `;
 
