@@ -66,7 +66,11 @@ const Modal: React.FC<ModalProps> = ({
                 {/* Días para corte — destacado */}
                 <CounterSection>
                   <CounterCard
+                    parentContainer={"Modal"}
                     count={calculateDaysUntilLimit(polizaData.next_payment)}
+                    includePayment={
+                      polizaData.payment_exist === "" ? false : true
+                    }
                     paymentdata={{
                       poliza: polizaData.poliza_uuid,
                       paid_period: polizaData.next_payment,
@@ -76,7 +80,9 @@ const Modal: React.FC<ModalProps> = ({
                   <SectionMeta>
                     <MetaItem>
                       <MetaLabel>Siguiente pago</MetaLabel>
-                      <MetaValue>{formatDate(polizaData.next_payment)}</MetaValue>
+                      <MetaValue>
+                        {formatDate(polizaData.next_payment)}
+                      </MetaValue>
                     </MetaItem>
                     <MetaItem>
                       <MetaLabel>Día de cobro</MetaLabel>
@@ -109,7 +115,9 @@ const Modal: React.FC<ModalProps> = ({
                     </Field>
                     <Field>
                       <FieldLabel>Fecha de emisión</FieldLabel>
-                      <FieldValue>{formatDate(polizaData.fecha_emision)}</FieldValue>
+                      <FieldValue>
+                        {formatDate(polizaData.fecha_emision)}
+                      </FieldValue>
                     </Field>
                     <Field>
                       <FieldLabel>Moneda</FieldLabel>
@@ -163,7 +171,9 @@ const Modal: React.FC<ModalProps> = ({
                     </Field>
                     <Field>
                       <FieldLabel>Código Postal</FieldLabel>
-                      <FieldValue>{polizaData.direccion.codigoPostal}</FieldValue>
+                      <FieldValue>
+                        {polizaData.direccion.codigoPostal}
+                      </FieldValue>
                     </Field>
                     <Field>
                       <FieldLabel>País</FieldLabel>
@@ -194,7 +204,7 @@ const ModalShadow = styled.div`
   justify-content: center;
   background-color: rgba(4, 4, 4, 0.55);
   backdrop-filter: blur(3px);
-  z-index: 100000;
+  z-index: 10;
 `;
 
 /* ─── Card ────────────────────────────────────────────────────── */
@@ -208,6 +218,7 @@ const ModalContent = styled.div`
   ${sectionTheme__css}
   ${sectionBorderTheme__css}
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.22);
+  z-index: 10;
 `;
 
 /* ─── Header ──────────────────────────────────────────────────── */
@@ -218,7 +229,8 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   padding: 16px 20px;
   border-bottom: 1px solid
-    ${(p) => (p.theme.mode === "Dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)")};
+    ${(p) =>
+      p.theme.mode === "Dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"};
   flex-shrink: 0;
 `;
 
@@ -284,7 +296,9 @@ const CloseBtn = styled.button`
   cursor: pointer;
   ${textTheme__css}
   opacity: 0.6;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   &:hover {
     opacity: 1;
     background-color: ${(p) =>

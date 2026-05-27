@@ -43,11 +43,6 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Cerrar menú al cambiar de ruta
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [navigate]);
-
   const handleLogout = () => {
     localStorage.removeItem("session_jwt");
     auth?.setSession(null);

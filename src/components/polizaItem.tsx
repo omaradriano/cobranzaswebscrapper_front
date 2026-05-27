@@ -43,6 +43,7 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
             <MayorText>{data.num_poliza}</MayorText>
             <div>
               <CounterCard
+                parentContainer={"Row"}
                 includePayment={data.payment_exist === "" ? false : true}
                 label={"Días para corte"}
                 count={calculateDaysUntilLimit(data.next_payment)}
@@ -84,6 +85,7 @@ const PolizaItem: React.FC<PolizaItemProps> = ({
           </div>
           <NotificationDiv>
             <CounterCard
+              parentContainer={"Row"}
               includePayment={data.payment_exist === "" ? false : true}
               count={calculateDaysUntilLimit(data.next_payment)}
               paymentdata={{
