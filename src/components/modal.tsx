@@ -46,17 +46,17 @@ const Modal: React.FC<ModalProps> = ({
   const dependientes = polizaData?.asegurados?.filter((a) => !a.is_principal);
 
   const [editFields, setEditFields] = useState<EditableFields>({
-    forma_pago: polizaData.forma_pago as FormaPago,
-    diaCobro: polizaData.diaCobro,
-    estatus: polizaData.estatus,
+    forma_pago: (polizaData.forma_pago ?? "MENSUAL") as FormaPago,
+    diaCobro: polizaData.diaCobro ?? 0,
+    estatus: polizaData.estatus ?? "En Vigor",
   });
 
   // Reset editable fields when modal closes or polizaData changes
   useEffect(() => {
     setEditFields({
-      forma_pago: polizaData.forma_pago as FormaPago,
-      diaCobro: polizaData.diaCobro,
-      estatus: polizaData.estatus,
+      forma_pago: (polizaData.forma_pago ?? "MENSUAL") as FormaPago,
+      diaCobro: polizaData.diaCobro ?? 0,
+      estatus: polizaData.estatus ?? "En Vigor",
     });
   }, [polizaData, modalOpen]);
 
@@ -150,7 +150,7 @@ const Modal: React.FC<ModalProps> = ({
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
-                        value={editFields.diaCobro === 0 ? "" : editFields.diaCobro}
+                        value={String(editFields.diaCobro === 0 ? "" : editFields.diaCobro)}
                         placeholder="0"
                         onChange={handleDiaCobroChange}
                         onBlur={handleDiaCobroBlur}
