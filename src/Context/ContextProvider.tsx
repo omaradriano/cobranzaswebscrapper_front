@@ -51,8 +51,15 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
         location.pathname === "/home" 
         || location.pathname === "/auth/signin" 
         || location.pathname === "/privacy" 
-        // || location.pathname === '/auth/register';
-
+        || location.pathname === '/auth/loggedin'
+        || location.pathname === '/auth/register'
+        || location.pathname === '/auth/setpassword'
+        || location.pathname === '/auth/emailsended'
+        || location.pathname === '/auth/registercompleted'
+        || location.pathname === '/auth/resetpasswordcompleted'
+        || location.pathname === '/auth/verifiedaccount'
+        || location.pathname === '/auth/resetpasswordinitflow';
+        
       if (!session_token) {
         setIsAuthenticated(false);
         setSession(null);
