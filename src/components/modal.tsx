@@ -23,7 +23,7 @@ type FormaPago = "MENSUAL" | "TRIMESTRAL" | "SEMESTRAL" | "ANUAL";
 
 interface EditableFields {
   forma_pago: FormaPago;
-  dia_cobro: string;
+  dia_cobro: number;
   estatus: StatusValues;
 }
 
@@ -54,9 +54,9 @@ const Modal: React.FC<ModalProps> = ({
 
   const getInitialFields = () => ({
     forma_pago: (polizaData.forma_pago ?? "MENSUAL") as FormaPago,
-    dia_cobro: polizaData.diaCobro ?? "",
+    dia_cobro: polizaData.diaCobro ?? 0,
     estatus: polizaData.estatus ?? "En Vigor",
-    numpoliza: polizaData.num_poliza
+    numpoliza: polizaData.num_poliza,
   });
 
   // Use a key to force remount and reset state when polizaData or modalOpen changes
@@ -72,7 +72,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const hasChanges =
     editFields.forma_pago !== polizaData.forma_pago ||
-    editFields.dia_cobro !== polizaData.dia_cobro ||
+    editFields.dia_cobro !== polizaData.diaCobro ||
     editFields.estatus !== polizaData.estatus;
 
   const handleDiaCobroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,12 +87,12 @@ const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  const toggleEstatus = () => {
-    setEditFields((prev) => ({
-      ...prev,
-      estatus: prev.estatus === "En Vigor" ? "Anulada" : "En Vigor",
-    }));
-  };
+  // const toggleEstatus = () => {
+  //   setEditFields((prev) => ({
+  //     ...prev,
+  //     estatus: prev.estatus === "En Vigor" ? "Anulada" : "En Vigor",
+  //   }));
+  // };
 
   const handleGuardar = async () => {
     const session_token = localStorage.getItem("session_jwt");
@@ -110,15 +110,14 @@ const Modal: React.FC<ModalProps> = ({
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${session_token}`,
+            Authorization: `Bearer ${session_token}`,
           },
-          body: JSON.stringify({...editFields}),
+          body: JSON.stringify({ ...editFields }),
         },
       );
 
       const response_json = await response.json();
       console.log(response_json);
-      
     } catch (error) {
       console.log(error);
     }
@@ -180,8 +179,11 @@ const Modal: React.FC<ModalProps> = ({
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
+                        disabled
                         value={String(
-                          editFields.dia_cobro === 0 ? "" : editFields.dia_cobro,
+                          editFields.dia_cobro === 0
+                            ? ""
+                            : editFields.dia_cobro,
                         )}
                         placeholder="0"
                         onChange={handleDiaCobroChange}
@@ -192,6 +194,7 @@ const Modal: React.FC<ModalProps> = ({
                       <MetaLabel>Forma de pago</MetaLabel>
                       <EditSelect
                         value={editFields.forma_pago}
+                        disabled
                         onChange={(e) =>
                           setEditFields((prev) => ({
                             ...prev,
@@ -210,7 +213,7 @@ const Modal: React.FC<ModalProps> = ({
                       <MetaLabel>Estatus</MetaLabel>
                       <EstatusToggle
                         $active={editFields.estatus === "En Vigor"}
-                        onClick={toggleEstatus}
+                        // onClick={toggleEstatus}
                         type="button"
                       >
                         <EstatusIndicator
