@@ -1,5 +1,5 @@
-import React from "react";
-import { AuthButton, InputText } from "./styles";
+import React, { useState } from "react";
+import { AuthButton, CredentialAlert, InputText } from "./styles";
 import { useNavigate } from "react-router";
 
 const ResetPasswordMail: React.FC = () => {
@@ -10,6 +10,11 @@ const ResetPasswordMail: React.FC = () => {
   const handleEmailChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(evt.target.value);
   };
+
+  const [showError, setShowError] = useState<{
+    isValid: boolean;
+    errorMessage: string;
+  }>({ isValid: true, errorMessage: "" });
 
   const handlePasswordEmail = async () => {
     // Aquí iría la lógica para enviar el correo de restablecimiento
@@ -26,8 +31,17 @@ const ResetPasswordMail: React.FC = () => {
 
     const data = await resetpassflow.json();
 
+    console.log(data);
+
     if (!data.success) {
-      console.error("Error al enviar correo de restablecimiento:", data.message);
+      console.error(
+        "Error al enviar correo de restablecimiento:",
+        data.message,
+      );
+      setShowError({
+        isValid: false,
+        errorMessage: 'No existe usuario ligado a este correo electrónico'
+      });
       return;
     }
 
@@ -51,6 +65,12 @@ const ResetPasswordMail: React.FC = () => {
         type="DefaultBlue"
         action={handlePasswordEmail}
       />
+
+      {!showError.isValid ? (
+        <CredentialAlert $valid={false}>
+          <p>{showError.errorMessage}</p>
+        </CredentialAlert>
+      ) : null}
     </>
   );
 };

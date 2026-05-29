@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
-import { AuthButton, InputText } from "./styles";
+import React, { useContext, useState } from "react";
+import { AuthButton, CredentialAlert, InputText } from "./styles";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../Context/ContextConfig";
 import type { session_claims } from "../../Types/types";
+import styled from "styled-components";
 
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +14,11 @@ const SignInForm: React.FC = () => {
     email: "",
     password: "",
   });
+
+  const [showError, setShowError] = useState<{
+    isValid: boolean;
+    errorMessage: string;
+  }>({ isValid: true, errorMessage: "" });
 
   async function handleSignIn(credentials: {
     email: string;
@@ -66,6 +72,10 @@ const SignInForm: React.FC = () => {
       navigate("/dashboard");
     } else {
       console.error("Error al iniciar sesión:", auth_data.message);
+      setShowError({
+        isValid: false,
+        errorMessage: auth_data.message,
+      });
     }
   }
 
@@ -94,16 +104,39 @@ const SignInForm: React.FC = () => {
           }
         />
       </InputText>
-      <AuthButton
-        label="Iniciar sesión"
-        type="DefaultBlue"
-        action={() => {
-          handleSignIn(credentials);
-        }}
-      />
+      <SignInFooter>
+        <AuthButton
+          label="Iniciar sesión"
+          type="DefaultBlue"
+          action={() => {
+            handleSignIn(credentials);
+          }}
+        />
+        <ForgotPassLink onClick={()=>{navigate('/auth/resetpasswordinitflow')}}>Olvidé mi contraseña</ForgotPassLink>
+      </SignInFooter>
+      {!showError.isValid ? (
+        <CredentialAlert $valid={false}>
+          <p>{showError.errorMessage}</p>
+        </CredentialAlert>
+      ) : null}
       {/* <Button label="Entrar como Demo" type="Default" /> */}
     </>
   );
 };
+
+const SignInFooter = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+`
+
+const ForgotPassLink = styled.p`
+  display: inline-block;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+`
 
 export default SignInForm;
