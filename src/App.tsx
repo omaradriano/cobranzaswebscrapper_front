@@ -11,6 +11,7 @@ import Home from "./components/home";
 import Calendar from "./components/calendar/Calendar";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import Pricing from "./components/Pricing";
+import Support from "./components/Support";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="calendar" element={<Calendar />}></Route>
         <Route path="privacy" element={<PrivacyPolicy />}></Route>
         <Route path="pricing" element={<Pricing />}></Route>
+        <Route path="support" element={<Support />}></Route>
       </Routes>
     </ContextProvider>
   );
