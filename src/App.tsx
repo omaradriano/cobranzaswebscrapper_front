@@ -10,6 +10,7 @@ import { Route, Routes } from "react-router";
 import Home from "./components/home";
 import Calendar from "./components/calendar/Calendar";
 import PrivacyPolicy from "./components/PrivacyPolicy";
+import Pricing from "./components/Pricing";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="auth/verifiedaccount" element={<AuthView mode="Verified"/>}></Route>
         <Route path="calendar" element={<Calendar />}></Route>
         <Route path="privacy" element={<PrivacyPolicy />}></Route>
+        <Route path="pricing" element={<Pricing />}></Route>
       </Routes>
     </ContextProvider>
   );

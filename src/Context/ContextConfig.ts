@@ -29,3 +29,8 @@ export const DataChangedContext = createContext<{
   dataHasChanged: number,
   setDataHasChanged: React.Dispatch<React.SetStateAction<number>>;
 } | null>(null)
+
+export const SubscriptionContext = createContext<{
+  isSubscribed: boolean;
+  setIsSubscribed: React.Dispatch<React.SetStateAction<boolean>>;
+} | null>(null)

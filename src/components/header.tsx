@@ -66,6 +66,7 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
       {/* DESKTOP NAV */}
       <DesktopView>
         <CustomNavLink to="/privacy">Privacidad</CustomNavLink>
+        <CustomNavLink to="/pricing">Precios</CustomNavLink>
 
         {isAuthenticated ? (
           <>
@@ -122,6 +123,11 @@ const Header: React.FC<HeaderProps> = ({ userType = "Admin" }) => {
             <DrawerLink to="/privacy" onClick={() => setMenuOpen(false)}>
               <Icon iconName="Policy" size={18} />
               <span>Privacidad</span>
+            </DrawerLink>
+
+            <DrawerLink to="/pricing" onClick={() => setMenuOpen(false)}>
+              <Icon iconName="CreditCard" size={18} />
+              <span>Precios</span>
             </DrawerLink>
 
             {isAuthenticated ? (

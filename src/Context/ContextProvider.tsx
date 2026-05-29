@@ -5,6 +5,7 @@ import {
   UserModeContext,
   AuthContext,
   DataChangedContext,
+  SubscriptionContext,
 } from "./ContextConfig";
 import { useEffect, useState } from "react";
 import type { DefaultTheme } from "styled-components/dist/types";
@@ -35,6 +36,7 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [session, setSession] = useState<session_claims | null>(null);
   const [dataHasChanged, setDataHasChanged] = useState<number>(0);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
   // 💡 Estado para saber si ya terminamos de validar la sesión y no renderizar a ciegas
   const [loading, setLoading] = useState(true);
@@ -130,20 +132,22 @@ const ContextProvider = ({ children }: { children: React.ReactNode }) => {
     >
       <ThemeContext.Provider value={{ theme, setTheme }}>
         <DataChangedContext.Provider value={{ dataHasChanged, setDataHasChanged }}>
-          <ThemeProvider theme={themeValues as DefaultTheme}>
-            <UserModeContext.Provider value={"Admin"}>
-              <AlertContext.Provider
-                value={{
-                  alertOptions,
-                  setAlertOptions,
-                  showAlert,
-                  setShowAlert,
-                }}
-              >
-                {children}
-              </AlertContext.Provider>
-            </UserModeContext.Provider>
-          </ThemeProvider>
+          <SubscriptionContext.Provider value={{ isSubscribed, setIsSubscribed }}>
+            <ThemeProvider theme={themeValues as DefaultTheme}>
+              <UserModeContext.Provider value={"Admin"}>
+                <AlertContext.Provider
+                  value={{
+                    alertOptions,
+                    setAlertOptions,
+                    showAlert,
+                    setShowAlert,
+                  }}
+                >
+                  {children}
+                </AlertContext.Provider>
+              </UserModeContext.Provider>
+            </ThemeProvider>
+          </SubscriptionContext.Provider>
         </DataChangedContext.Provider>
       </ThemeContext.Provider>
     </AuthContext.Provider>
